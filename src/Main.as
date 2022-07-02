@@ -42,11 +42,15 @@ void SetMenuBgImages() {
                     warn("timeOfDay var will crash the game! value=" + timeOfDay);
                     break;
                 }
-                if (!quad.ImageUrl.EndsWith("Background_" + timeOfDay)) {
+                if (!quad.ImageUrl.EndsWith("Background_" + timeOfDay) || (useCustomImage && quad.ImageUrl != customImageURL)) {
                     // print("uiLayer: " + layer.IdName + ", bgFrame: " + bgFrame.IdName);
                     // print(quad.ImageUrl);
                     // quad.ImageUrl = "file://Media/Manialinks/Nadeo/TMNext/Menus/MainBackgrounds/Background_" + timeOfDay;  // this seems to work, but I guess using the below function is preferred.
-                    quad.ChangeImageUrl("file://Media/Manialinks/Nadeo/TMNext/Menus/MainBackgrounds/Background_" + timeOfDay);
+                    if (!useCustomImage) {
+                        quad.ChangeImageUrl("file://Media/Manialinks/Nadeo/TMNext/Menus/MainBackgrounds/Background_" + timeOfDay);
+                    } else {
+                        quad.ChangeImageUrl(customImageURL);
+                    }
                 }
             }
         }
@@ -67,3 +71,24 @@ bool Setting_Enabled = true;
 
 [Setting category="General" name="Menu bg time of day"]
 NadeoMenuBackground Setting_BackgroundChoice = NadeoMenuBackground::Morning;
+
+[Setting hidden]
+bool useCustomImage = false;
+
+[Setting hidden]
+string customImageURL = "https://i.imgur.com/cysV8Fn.png";
+
+string imageURLTextBox = customImageURL;
+
+[SettingsTab name="Custom Image"]
+void RenderCustomImageSettingsTab() {
+    UI::Text("\\$f80Warning\\$z: A wrong image URL can result a game crash. Be careful!");
+    useCustomImage = UI::Checkbox("Use custom image", useCustomImage);
+    if (useCustomImage) {
+        bool pressedEnter = false;
+        imageURLTextBox = UI::InputText("Image URL", imageURLTextBox, pressedEnter, UI::InputTextFlags::EnterReturnsTrue);
+        if (pressedEnter || UI::Button("Apply")) {
+            customImageURL = imageURLTextBox;
+        }
+    }
+}
