@@ -1,8 +1,12 @@
 # Trackmania Menu Bg Chooser
 
-This let's you choose the time of day for the main menu background.
+This let's you choose the main menu background. You can choose from:
 
-To return to normal, uncheck "enable" in settings and then restart Trackmania (sorry, it's a lot more work to avoid this).
+* A custom time of day (morning, day, evening, or night).
+* A custom png, jpg, or webm file (via URL)
+* TMX monthly backgrounds (either the current month or a random month)
+
+To return to normal, select "Disabled" in settings and then restart Trackmania (sorry, it's a lot more work to avoid this).
 
 License: Public Domain
 
