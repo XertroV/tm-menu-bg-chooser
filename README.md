@@ -6,6 +6,8 @@ To return to normal, uncheck "enable" in settings and then restart Trackmania (s
 
 License: Public Domain
 
+Authors: XertroV, Greep
+
 Suggestions/feedback: @XertroV on Openplanet discord
 
 Code/issues: <https://github.com/XertroV/tm-menu-bg-chooser>

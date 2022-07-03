@@ -97,6 +97,18 @@ namespace GI {
         return GetMenuCustom().UILayers[i];
     }
 
+    CNetScriptHttpManager@ GetHttpManager() {
+        return GetMenuCustom().Http;
+    }
+
+    CGameMenuSceneScriptManager@ GetMenuSceneManager() {
+        return GetMenuCustom().MenuSceneManager;
+    }
+
+    CGameManialinkScriptHandler@ GetMenuManialinkScriptHandler() {
+        return GetMenuManager().ManialinkScriptHandlerMenus;
+    }
+
     // CGamePlaygroundUIConfig@ GetPlaygroundUIConfig() {
     //     auto pg = GetCurrentPlayground();
     //     if (pg is null) return null;
