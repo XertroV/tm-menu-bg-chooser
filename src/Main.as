@@ -6,11 +6,13 @@
   */
 
 void Main() {
+    // we do stuff through coros so settings have a chance to load
     startnew(CoroMain);
 }
 
 void CoroMain() {
     startnew(CheckAndCacheCustomUrl);
+    startnew(CoroLoadCurrTmxData);
     while (true) {
         SetMenuBgImages();
         yield();
@@ -61,10 +63,10 @@ void SetMenuBgImages() {
                 // print('' + bgFrame.Control.Scene.Id.GetName());
                 // auto painter = GI::GetTmApp().Resources.PainterSetting;
                 // print('' + painter.ScenesFids.Length);
-                for (uint k = 0; k < 1; k++) {
-                    GI::GetMenuSceneManager().PlaneReflectEnable1(MwId(k), 0.0f, quads[0], quads[1], quads[2], quads[3], 1.0f);
-                    GI::GetMenuSceneManager().PlaneReflectRefresh();
-                }
+                // for (uint k = 0; k < 1; k++) {
+                GI::GetMenuSceneManager().PlaneReflectEnable1(MwId(0xffffffff), 0.0f, quads[0], quads[1], quads[2], quads[3], 1.0f);
+                GI::GetMenuSceneManager().PlaneReflectRefresh();
+                // }
             }
             if (frameGlobal !is null) {
                 if (cameraVehicle !is null) {
@@ -102,7 +104,54 @@ void SetQuadTimeOfDay(CGameManialinkQuad@ quad) {
         quad.ChangeImageUrl("file://Media/Manialinks/Nadeo/TMNext/Menus/MainBackgrounds/Background_" + timeOfDay);
     }
 }
-void SetQuadTmx(CGameManialinkQuad@ quad) {}
+
+const uint AugustFirst2020 = 1596260880;
+const uint SecondsInAMonth = 2629800;
+const uint tmxDateBuffer = 2 * 86400; // 2 days
+uint maxMonth;
+string tmxMonthYr;
+
+string InitTmxUrlAndData() {
+    uint now = Time::Stamp;
+    uint dt = now - AugustFirst2020; // seconds since first map bg
+    // dt -= tmxDateBuffer; // set time 2 days in the past to give enough time for bg to be made
+    dt = dt - (dt % SecondsInAMonth);
+    uint monthNumber = dt / SecondsInAMonth; // the current month
+    trace('monthNumber:' + monthNumber);
+    maxMonth = monthNumber; // track max month for randomized bg
+    return RefreshTmxData();
+}
+
+string RefreshTmxData() {
+    int theMonth;
+    if (!Setting_TmxRandom) {
+        theMonth = maxMonth;
+    } else {
+        theMonth = Math::Rand(0, maxMonth + 1);
+    }
+    uint calMonth = ((theMonth + 7) % 12) + 1; // 01 through 12
+    trace('calMonth:' + calMonth);
+    uint yr = 20 + (theMonth + 7 - calMonth + 1) / 12;
+    return MakeTmxBgUrl(yr, calMonth);
+}
+
+string MakeTmxBgUrl(uint yr, uint month) {
+    tmxMonthYr = '' + yr + "-" + Text::Format("%02d", month);
+    return "https://images.mania-exchange.com/next/backgrounds/" + tmxMonthYr + "/bg.jpg";
+}
+
+string tmxCurrUrl = InitTmxUrlAndData();
+
+void CoroLoadCurrTmxData() {
+    tmxCurrUrl = RefreshTmxData();
+}
+
+void SetQuadTmx(CGameManialinkQuad@ quad) {
+    if (quad.ImageUrl != tmxCurrUrl) {
+        quad.ChangeImageUrl(tmxCurrUrl);
+    }
+}
+
 void SetQuadCustom(CGameManialinkQuad@ quad) {
     string url = customImageURL;
     if (Setting_CheckedCurrentCustomImgUrl || UrlOkayToShowAsBg(url)) {
@@ -111,22 +160,3 @@ void SetQuadCustom(CGameManialinkQuad@ quad) {
         }
     }
 }
-// void SetQuad(CGameManialinkQuad@ quad) {
-
-
-
-// [Setting category="General" name="Enabled?" description="Restart the game after disabling to return to normal."]
-// bool Setting_Enabled = true;
-
-// [SettingsTab name="Custom Image"]
-// void RenderCustomImageSettingsTab() {
-//     UI::Text("\\$f80Warning\\$z: A wrong image URL can result a game crash. Be careful!");
-//     useCustomImage = UI::Checkbox("Use custom image", useCustomImage);
-//     if (useCustomImage) {
-//         bool pressedEnter = false;
-//         imageURLTextBox = UI::InputText("Image URL", imageURLTextBox, pressedEnter, UI::InputTextFlags::EnterReturnsTrue);
-//         if (pressedEnter || UI::Button("Apply")) {
-//             customImageURL = imageURLTextBox;
-//         }
-//     }
-// }

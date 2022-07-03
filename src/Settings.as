@@ -81,7 +81,16 @@ void _DrawTod() {
 
 /* TMX */
 
-void _DrawTmx() {}
+[Setting hidden]
+bool Setting_TmxRandom = false;
+
+void _DrawTmx() {
+    Setting_TmxRandom = UI::Checkbox("Randomize TMX Background?", Setting_TmxRandom);
+    if (MDisabledButton(!Setting_TmxRandom, "Randomize Now")) {
+        tmxCurrUrl = RefreshTmxData();
+    }
+    UI::Text("Date of current background (YY-MM): " + tmxMonthYr);
+}
 
 /* CUSTOM */
 
