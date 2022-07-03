@@ -19,7 +19,7 @@ bool PluginIsEnabled() {
 bool Setting_HideCar = false;
 
 [SettingsTab name="Menu Background"]
-void RenderSettings() {
+void RenderMenuBgSettings() {
     UI::Text("Background Mode:");
     VPad();
 

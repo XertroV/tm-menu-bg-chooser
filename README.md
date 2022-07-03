@@ -14,6 +14,6 @@ Authors: XertroV, Greep
 
 Suggestions/feedback: @XertroV on Openplanet discord
 
-Code/issues: <https://github.com/XertroV/tm-menu-bg-chooser>
+Code/issues: [https://github.com/XertroV/tm-menu-bg-chooser](https://github.com/XertroV/tm-menu-bg-chooser)
 
 GL HF

@@ -26,6 +26,8 @@ dictionary@ okayTimeOfDays =
     , {'Night.jpg', true}
 };
 
+string[] defaultTodQuadsOrder = {"Night.jpg", "Day.png", "Morning.png", "Evening.png"};
+
 CGameManialinkFrame@ menuBgFrame;
 
 bool WillCrashTheGame(const string &in tod) {
@@ -55,7 +57,7 @@ void SetMenuBgImages() {
             for (uint j = 0; j < cs.Length; j++) {
                 auto quad = cast<CGameManialinkQuad@>(cs[j]);
                 if (quad is null) continue;
-                SetQuad(quad);
+                SetQuad(j, quad);
                 quads.InsertLast(quad);
             }
             if (quads.Length == 4) {
@@ -70,7 +72,7 @@ void SetMenuBgImages() {
             }
             if (frameGlobal !is null) {
                 if (cameraVehicle !is null) {
-                    cameraVehicle.Visible = !Setting_HideCar;
+                    cameraVehicle.Visible = !(Setting_HideCar && PluginIsEnabled());
                     // cameraVehicle.Hide();
                 } else {
                     // print("null camera vehicle");
@@ -82,26 +84,31 @@ void SetMenuBgImages() {
 
 
 
-void SetQuad(CGameManialinkQuad@ quad) {
+void SetQuad(uint ix, CGameManialinkQuad@ quad) {
     if (Setting_Mode == BgMode::SetTimeOfDay) {
         SetQuadTimeOfDay(quad);
     } else if (Setting_Mode == BgMode::TMX) {
         SetQuadTmx(quad);
     } else if (Setting_Mode == BgMode::CustomUrl) {
         SetQuadCustom(quad);
+    } else if (Setting_Mode == BgMode::Disabled) {
+        SetQuadDisabled(ix, quad);
     }
 }
 
+// include the suffix for timeOfDay
+string GetDefaultBgUrl(const string &in timeOfDay) {
+    if (WillCrashTheGame(timeOfDay)) {
+        throw("timeOfDay var will crash the game! value=" + timeOfDay);
+    }
+    return "file://Media/Manialinks/Nadeo/TMNext/Menus/MainBackgrounds/Background_" + timeOfDay;
+}
 
 void SetQuadTimeOfDay(CGameManialinkQuad@ quad) {
     string timeOfDay = MenuBgNames[Setting_BackgroundChoice];
-    if (WillCrashTheGame(timeOfDay)) {
-        warn("timeOfDay var will crash the game! value=" + timeOfDay);
-    } else if (!quad.ImageUrl.EndsWith("Background_" + timeOfDay)) {
-        // print("uiLayer: " + layer.IdName + ", bgFrame: " + bgFrame.IdName);
-        // print(quad.ImageUrl);
-        // quad.ImageUrl = "file://Media/Manialinks/Nadeo/TMNext/Menus/MainBackgrounds/Background_" + timeOfDay;  // this seems to work, but I guess using the below function is preferred.
-        quad.ChangeImageUrl("file://Media/Manialinks/Nadeo/TMNext/Menus/MainBackgrounds/Background_" + timeOfDay);
+    string url = GetDefaultBgUrl(timeOfDay);
+    if (quad.ImageUrl != url) {
+        quad.ChangeImageUrl(url);
     }
 }
 
@@ -158,5 +165,13 @@ void SetQuadCustom(CGameManialinkQuad@ quad) {
         if (quad.ImageUrl != url) {
             quad.ChangeImageUrl(url);
         }
+    }
+}
+
+void SetQuadDisabled(uint ix, CGameManialinkQuad@ quad) {
+    // this isn't triggered atm b/c we need a way to default all settings back that isn't just `&&IsPluginEnabled()` everywhere (well, we could do that but it's probs annoying and will lead to bugs)
+    string url = GetDefaultBgUrl(defaultTodQuadsOrder[ix]);
+    if (quad.ImageUrl != url) {
+        quad.ChangeImageUrl(url);
     }
 }
