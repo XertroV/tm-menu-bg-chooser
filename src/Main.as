@@ -27,6 +27,10 @@ dictionary@ okayTimeOfDays =
 };
 
 string[] defaultTodQuadsOrder = {"Night.jpg", "Day.png", "Morning.png", "Evening.png"};
+// string[] defaultTodQuadsOrder = {"Morning.png", "Day.png", "Evening.png", "Night.jpg"};
+
+// in ranked/royal it seems to be: Night, Midday, Dawn, Sunset
+// mainmenu.script has: Night, Day, Morning, Evening when it calls `PlaneReflectEnable`
 
 CGameManialinkFrame@ menuBgFrame;
 
@@ -41,15 +45,31 @@ void SetMenuBgImages() {
     auto mc = GI::GetMenuCustom();
     auto layers = mc.UILayers;
 
-    for (uint i = 0; i < layers.Length; i++) {
+    // can always skip the first 7 or so layers
+    for (uint i = 7; i < layers.Length; i++) {
         auto layer = layers[i];
+
         if (!layer.IsVisible) continue;
+        // #frame-quad only exists on ranked/royal menu screens (I think) -- this test might need updating in the future
+        bool isRanked = layer.LocalPage.GetFirstChild("frame-squad") !is null;
+
         // this is the ControlId for the frame that holds the 4 bg quads
         auto bgFrame = cast<CGameManialinkFrame@>(layer.LocalPage.GetFirstChild("ComponentMainBackground_frame-global"));
+
+        string cameraVehicleId = isRanked ? "camera-vehicles" : "camera-vehicle";
+        bool carAndReflShouldHide = PluginIsEnabled() && ((Setting_HideCar && !isRanked) || (Setting_HideCarOnRanked && isRanked));
+
+        // main bg updating logic
         if (bgFrame !is null) {
-            auto mainFrame = layer.LocalPage.MainFrame;
-            auto frameGlobal = cast<CGameManialinkFrame@>(mainFrame.GetFirstChild("frame-global"));
-            auto cameraVehicle = cast<CGameManialinkCamera@>(mainFrame.GetFirstChild("camera-vehicle"));
+            // auto mainFrame = layer.LocalPage.MainFrame;
+            auto cameraVehicle = cast<CGameManialinkCamera@>(layer.LocalPage.GetFirstChild(cameraVehicleId));
+            if (cameraVehicle !is null) {
+                cameraVehicle.Visible = !carAndReflShouldHide;
+            }
+
+            // bail early for ranked/royal bgs if not enabled, but after we show/hide the car
+            if (isRanked && !Setting_EnableBgRanked) continue;
+            if (isRanked && Setting_Mode == BgMode::Disabled) continue;  // these menus reset themselves so nothing to do here if we're disabled.
 
             // print("uiLayer: " + layer.IdName + ", bgFrame: " + bgFrame.IdName);
             auto cs = bgFrame.Controls;
@@ -63,20 +83,8 @@ void SetMenuBgImages() {
             if (quads.Length == 4) {
                 // trace('Calling: PlaneReflectEnable0');
                 // print('' + bgFrame.Control.Scene.Id.GetName());
-                // auto painter = GI::GetTmApp().Resources.PainterSetting;
-                // print('' + painter.ScenesFids.Length);
-                // for (uint k = 0; k < 1; k++) {
-                GI::GetMenuSceneManager().PlaneReflectEnable1(MwId(0xffffffff), 0.0f, quads[0], quads[1], quads[2], quads[3], 1.0f);
+                GI::GetMenuSceneManager().PlaneReflectEnable1(bgFrame.Control.Scene.Id, 0.0f, quads[3], quads[1], quads[0], quads[2], 0.1f);
                 GI::GetMenuSceneManager().PlaneReflectRefresh();
-                // }
-            }
-            if (frameGlobal !is null) {
-                if (cameraVehicle !is null) {
-                    cameraVehicle.Visible = !(Setting_HideCar && PluginIsEnabled());
-                    // cameraVehicle.Hide();
-                } else {
-                    // print("null camera vehicle");
-                }
             }
         }
     }
@@ -104,12 +112,17 @@ string GetDefaultBgUrl(const string &in timeOfDay) {
     return "file://Media/Manialinks/Nadeo/TMNext/Menus/MainBackgrounds/Background_" + timeOfDay;
 }
 
+void CheckAndSetQuadImage(CGameManialinkQuad@ quad, const string &in url) {
+    if (quad.ImageUrl != url) {
+        trace('Set quad ' + quad.Id.GetName() + ' image: ' + url + ' (was: ' + quad.ImageUrl + ')');
+        quad.ChangeImageUrl(url);
+    }
+}
+
 void SetQuadTimeOfDay(CGameManialinkQuad@ quad) {
     string timeOfDay = MenuBgNames[Setting_BackgroundChoice];
     string url = GetDefaultBgUrl(timeOfDay);
-    if (quad.ImageUrl != url) {
-        quad.ChangeImageUrl(url);
-    }
+    CheckAndSetQuadImage(quad, url);
 }
 
 const uint AugustFirst2020 = 1596260880;
@@ -154,24 +167,18 @@ void CoroLoadCurrTmxData() {
 }
 
 void SetQuadTmx(CGameManialinkQuad@ quad) {
-    if (quad.ImageUrl != tmxCurrUrl) {
-        quad.ChangeImageUrl(tmxCurrUrl);
-    }
+    CheckAndSetQuadImage(quad, tmxCurrUrl);
 }
 
 void SetQuadCustom(CGameManialinkQuad@ quad) {
     string url = customImageURL;
     if (Setting_CheckedCurrentCustomImgUrl || UrlOkayToShowAsBg(url)) {
-        if (quad.ImageUrl != url) {
-            quad.ChangeImageUrl(url);
-        }
+        CheckAndSetQuadImage(quad, url);
     }
 }
 
 void SetQuadDisabled(uint ix, CGameManialinkQuad@ quad) {
     // this isn't triggered atm b/c we need a way to default all settings back that isn't just `&&IsPluginEnabled()` everywhere (well, we could do that but it's probs annoying and will lead to bugs)
     string url = GetDefaultBgUrl(defaultTodQuadsOrder[ix]);
-    if (quad.ImageUrl != url) {
-        quad.ChangeImageUrl(url);
-    }
+    CheckAndSetQuadImage(quad, url);
 }

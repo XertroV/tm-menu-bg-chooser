@@ -18,6 +18,12 @@ bool PluginIsEnabled() {
 [Setting hidden]
 bool Setting_HideCar = false;
 
+[Setting hidden]
+bool Setting_EnableBgRanked = true;
+
+[Setting hidden]
+bool Setting_HideCarOnRanked = false;
+
 [SettingsTab name="Menu Background"]
 void RenderMenuBgSettings() {
     UI::Text("Background Mode:");
@@ -37,6 +43,9 @@ void RenderMenuBgSettings() {
 
     VPad();
     Setting_HideCar = UI::Checkbox("Hide Car+Reflection on Menu Home Page?", Setting_HideCar);
+    Setting_EnableBgRanked = UI::Checkbox("Enable for Ranked/Royal Menu Page?", Setting_EnableBgRanked);
+    AddSimpleTooltip("You might want to disable this if you get flickers.\nThe same menu page is reused for both Ranked/Royal, which means the backgrounds need to be reset each time you load the menu.\nThere are multiple BG layers, and that's why it flickers more on ranked.");
+    Setting_HideCarOnRanked = UI::Checkbox("Hide Car+Reflection on Ranked/Royal Page?", Setting_HideCarOnRanked);
 
     VPad();
     UI::Separator();

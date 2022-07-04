@@ -12,3 +12,11 @@ bool MDisabledButton(bool disabled, const string &in text, const vec2 &in size =
         return UI::Button(text, size);
     }
 }
+
+void AddSimpleTooltip(string msg) {
+    if (UI::IsItemHovered()) {
+        UI::BeginTooltip();
+        UI::Text(msg);
+        UI::EndTooltip();
+    }
+}
