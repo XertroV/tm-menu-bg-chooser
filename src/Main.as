@@ -1,6 +1,6 @@
 /* Notes:
 
-- Once a bg is added it is cached in: `C:\ProgramData\TrackMania\Cache`
+- Once a bg is added via URL it is cached in: `C:\ProgramData\TrackMania\Cache`
   That means the game won't crash on load if a resource disappears.
 
   */
@@ -45,7 +45,7 @@ void SetMenuBgImages() {
     auto mc = GI::GetMenuCustom();
     auto layers = mc.UILayers;
 
-    // can always skip the first 7 or so layers
+    // can always skip the first 7 or so layers (they are visible but don't have anything relevant)
     for (uint i = 7; i < layers.Length; i++) {
         auto layer = layers[i];
 
