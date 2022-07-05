@@ -21,7 +21,7 @@ bool CheckUrlExistsAndIsCached(const string &in url) {
     }
 
     @bgCheckReq = http.CreateGet2(url, true);
-    while (!bgCheckReq.IsCompleted) {
+    while (bgCheckReq is null || !bgCheckReq.IsCompleted) {
         yield();
     }
     trace("Download complete for URL: " + url + " (status=" + bgCheckReq.StatusCode + ")");

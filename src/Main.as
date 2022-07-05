@@ -8,6 +8,55 @@
 void Main() {
     // we do stuff through coros so settings have a chance to load
     startnew(CoroMain);
+    startnew(TestIntercept);
+}
+
+bool _SceneCreate(CMwStack &in stack) {
+    print("_SceneCreate called with: " + stack.Index() + " / " + stack.Count());
+    print("scene create called with: " + stack.CurrentWString());
+    return true;
+}
+
+bool _SceneDestroy(CMwStack &in stack) {
+    print("_SceneDestroy called with: " + stack.Index() + " / " + stack.Count());
+    print("scene destroy called with: " + stack.CurrentId().GetName());
+    return true;
+}
+
+float customAngle = -1.0f;
+
+bool _PlaneReflectEnable1(CMwStack &in stack, CMwNod@ nod) {
+    // Dev::DebugBreak();
+    // print("_PlaneReflectEnable1 called with: " + stack.Index() + " / " + stack.Count());
+    float angle = stack.CurrentFloat(); // angle
+    CGameManialinkQuad@ q4 = cast<CGameManialinkQuad>(stack.CurrentNod(1)); // quad
+    CGameManialinkQuad@ q3 = cast<CGameManialinkQuad>(stack.CurrentNod(2)); // quad
+    CGameManialinkQuad@ q2 = cast<CGameManialinkQuad>(stack.CurrentNod(3)); // quad
+    CGameManialinkQuad@ q1 = cast<CGameManialinkQuad>(stack.CurrentNod(4)); // quad
+    float opacity = stack.CurrentFloat(5);
+    MwId sceneId = stack.CurrentId(6);
+    print("sceneId: " + sceneId.GetName());
+    // todo
+    // auto thing = stack.CurrentBool(-1);
+    print("_PlaneReflectEnable1 angle is: " + angle + " and opacity: " + opacity);
+    if (opacity > 0.5) {
+        print("_PlaneReflectEnable1 called with: " + stack.Index() + " / " + stack.Count());
+        cast<CGameMenuSceneScriptManager>(nod).PlaneReflectEnable1(sceneId, 0.00, q4, q4, q4, q4, 0);
+        return false;
+    }
+    return true;
+}
+
+void TestIntercept() {
+    sleep(10);
+    Dev::InterceptProc("CGameMenuSceneScriptManager", "SceneCreate", _SceneCreate);
+    Dev::InterceptProc("CGameMenuSceneScriptManager", "SceneDestroy", _SceneDestroy);
+    Dev::InterceptProc("CGameMenuSceneScriptManager", "PlaneReflectEnable1", _PlaneReflectEnable1);
+    // ProcInterceptEx ideas:
+    // - pointer is an incoming arg?
+    // - called afterwards? (no args, void)
+    // - something to do with a chain of ProcIntercepts?
+    //
 }
 
 void CoroMain() {
@@ -39,7 +88,7 @@ bool WillCrashTheGame(const string &in tod) {
 }
 
 void SetMenuBgImages() {
-    if (!PluginIsEnabled()) return;
+    // if (!PluginIsEnabled()) return;
     while (!GI::InMainMenu()) yield();
 
     auto mc = GI::GetMenuCustom();
@@ -55,12 +104,27 @@ void SetMenuBgImages() {
 
         // this is the ControlId for the frame that holds the 4 bg quads
         auto bgFrame = cast<CGameManialinkFrame@>(layer.LocalPage.GetFirstChild("ComponentMainBackground_frame-global"));
+        // note: could probably get quads directly via ids like: ComponentMainBackground_quad-morning
 
         string cameraVehicleId = isRanked ? "camera-vehicles" : "camera-vehicle";
         bool carAndReflShouldHide = PluginIsEnabled() && ((Setting_HideCar && !isRanked) || (Setting_HideCarOnRanked && isRanked));
 
         // main bg updating logic
         if (bgFrame !is null) {
+            /* debug dump declare:
+                - 0 values: GI::GetTmApp().MenuManager.MenuCustom_CurrentManiaApp
+                - 0 values: layer.LocalPage
+                - 3 values: GI::GetTmApp().MenuManager.MenuCustom_CurrentManiaApp.ManiaPlanet
+                - 3 values: GI::GetTmApp().ManiaPlanetScriptAPI (same as above?)
+                - 23 values: GI::GetTmApp().UserManagerScript.Users[0]
+                - 0 values: scriptHandler.ParentApp
+                      auto scriptHandler = cast<CGameManiaAppTitleLayerScriptHandler>(layer.LocalPage.ScriptHandler);
+                */
+            // trace(GI::GetMenuManialinkScriptHandler().Dbg_DumpDeclareForVariables(GI::GetTmApp().Viewport.Overlays[3].UserData, false));
+            // trace(cast<CGameMenuFrame>(cast<CControlFrame>(layer.LocalPage.MainFrame.Control).Parent.Parent.Parent.Parent).Id.GetName());
+            // trace(GI::GetMenuManialinkScriptHandler().Dbg_DumpDeclareForVariables(cast<CGameMenuFrame>(cast<CControlFrame>(layer.LocalPage.MainFrame.Control).Parent.Parent.Parent.Parent), false));
+            // sleep(150);
+
             // auto mainFrame = layer.LocalPage.MainFrame;
             auto cameraVehicle = cast<CGameManialinkCamera@>(layer.LocalPage.GetFirstChild(cameraVehicleId));
             if (cameraVehicle !is null) {
@@ -83,8 +147,8 @@ void SetMenuBgImages() {
             if (quads.Length == 4) {
                 // trace('Calling: PlaneReflectEnable0');
                 // print('' + bgFrame.Control.Scene.Id.GetName());
-                GI::GetMenuSceneManager().PlaneReflectEnable1(bgFrame.Control.Scene.Id, 0.0f, quads[3], quads[1], quads[0], quads[2], 0.1f);
-                GI::GetMenuSceneManager().PlaneReflectRefresh();
+                // GI::GetMenuSceneManager().PlaneReflectEnable1(MwId(12345), 0.0f, quads[3], quads[1], quads[0], quads[2], 3.0f);
+                // GI::GetMenuSceneManager().PlaneReflectRefresh();
             }
         }
     }
