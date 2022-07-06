@@ -160,3 +160,11 @@ void _DrawDisabled() {
 void VPad() {
     UI::Dummy(vec2(0, 2));
 }
+
+/* Reflection Settings */
+
+[Setting category="BG Reflection" name="Opacity" min="-5.0" max="5.0"]
+float Setting_BgReflectionOpacity = 0.63;
+
+[Setting category="BG Reflection" name="Angle" min="-20.0" max="20.0"]
+float Setting_BgReflectionAngle = -2.1;

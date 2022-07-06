@@ -97,6 +97,10 @@ namespace GI {
         return GetMenuCustom().UILayers[i];
     }
 
+    MwFastBuffer<CGameUILayer@> GetUILayers() {
+        return GetMenuCustom().UILayers;
+    }
+
     CNetScriptHttpManager@ GetHttpManager() {
         return GetMenuCustom().Http;
     }
