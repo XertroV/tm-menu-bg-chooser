@@ -49,7 +49,7 @@ bool WillCrashTheGame(const string &in tod) {
     return !okayTimeOfDays.Exists(tod);
 }
 
-void SetMenuBgImages(bool ignoreDisabled = false) {
+void SetMenuBgImages(bool ignoreDisabled = false, bool ignoreVisibility = false) {
     if (!PluginIsEnabled() && !ignoreDisabled) return;
     while (!GI::InMainMenu()) yield();
 
@@ -60,7 +60,7 @@ void SetMenuBgImages(bool ignoreDisabled = false) {
     for (uint i = 7; i < layers.Length; i++) {
         auto layer = layers[i];
 
-        if (!layer.IsVisible) continue;
+        if (!layer.IsVisible && !ignoreVisibility) continue;
         // #frame-quad only exists on ranked/royal menu screens (I think) -- this test might need updating in the future
         bool isRanked = layer.LocalPage.GetFirstChild("frame-squad") !is null;
 

@@ -34,7 +34,7 @@ void RenderMenuBgSettings() {
                 Setting_Mode = BgMode(i);
                 // if the setting mode gets changed to disabled, force-run SetMenuBgItems once
                 if (!PluginIsEnabled()) {
-                    SetMenuBgImages(true);
+                    SetMenuBgImages(true, true);
                 }
             }
         }
