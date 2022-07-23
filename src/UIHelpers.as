@@ -20,3 +20,7 @@ void AddSimpleTooltip(string msg) {
         UI::EndTooltip();
     }
 }
+
+void VPad() {
+    UI::Dummy(vec2(0, 2));
+}

@@ -7,6 +7,7 @@
 CNetScriptHttpRequest@ bgCheckReq;
 string bgLastCheckedUrl;
 bool bgLastUrlValid = true;
+int bgLastUrlStatusCode = 200;
 
 bool CheckUrlExistsAndIsCached(const string &in url) {
     bgLastCheckedUrl = url;
@@ -28,6 +29,7 @@ bool CheckUrlExistsAndIsCached(const string &in url) {
 
     // Successful status codes could be any 2xx code I think.
     // I am unsure if redirects are followed or if direct urls are required.
+    bgLastUrlStatusCode = bgCheckReq.StatusCode;
     return bgCheckReq.StatusCode == 200;
 }
 

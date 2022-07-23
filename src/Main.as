@@ -5,11 +5,51 @@
 
   */
 
+UI::Font@ fontLarger;
+UI::Font@ fontLargerBold;
+
 void Main() {
     // we do stuff through coros so settings have a chance to load
+    SaveInitialQuadUrls();
     startnew(CoroMain);
     startnew(TestIntercept);
+    @fontLarger = UI::LoadFont("DroidSans.ttf", 18.0f);
+    @fontLargerBold = UI::LoadFont("DroidSans-Bold.ttf", 18.0f);
 }
+
+/* initial URLs -- caching these let's us emulate 'disabling' the plugin */
+
+string[] initialQuadUrls;
+
+void SaveInitialQuadUrls() {
+    initialQuadUrls = {};
+    auto mc = GI::GetMenuCustom();
+    auto layers = mc.UILayers;
+
+    // can always skip the first 7 or so layers (they are visible but don't have anything relevant)
+    for (uint i = 7; i < layers.Length; i++) {
+        auto layer = layers[i];
+        // this is the ControlId for the frame that holds the 4 bg quads
+        auto bgFrame = cast<CGameManialinkFrame@>(layer.LocalPage.GetFirstChild("ComponentMainBackground_frame-global"));
+        if (bgFrame !is null) {
+            auto cs = bgFrame.Controls;
+            CGameManialinkQuad@[] quads = {};
+            for (uint j = 0; j < cs.Length; j++) {
+                auto quad = cast<CGameManialinkQuad@>(cs[j]);
+                if (quad is null) continue;
+                quads.InsertLast(quad);
+            }
+            if (quads.Length == 4) {
+                // MenuSceneMgr_PlaneReflectEnable(LastBgSceneId, Setting_BgReflectionOpacity, quads[3], quads[1], quads[0], quads[2], Setting_BgReflectionAngle);
+                for (uint j = 0; j < quads.Length; j++) {
+                    initialQuadUrls.InsertLast(quads[j].ImageUrl);
+                }
+                break;
+            }
+        }
+    }
+}
+
 
 bool _SceneCreate(CMwStack &in stack) {
     print("_SceneCreate called with: " + stack.Index() + " / " + stack.Count());
@@ -40,7 +80,7 @@ bool _PlaneReflectEnable1(CMwStack &in stack, CMwNod@ nod) {
     MwId sceneId = stack.CurrentId(6); // must be used with the correct MenuSceneMgr instance -- will not work with `GI::GetMenuSceneManager()`!
     // print("sceneId: " + sceneId.GetName()); // always #12345
     trace("_PlaneReflectEnable1 angle is: " + angle + " and opacity: " + opacity);
-    if (AllowPlaneReflectEnableCall) {
+    if (AllowPlaneReflectEnableCall || Setting_Mode == BgMode::Disabled) {
         AllowPlaneReflectEnableCall = false;
         return true;
     } else {
@@ -54,7 +94,7 @@ bool _PlaneReflectEnable1(CMwStack &in stack, CMwNod@ nod) {
 
 // use this to call PlaneReflectEnable
 void MenuSceneMgr_PlaneReflectEnable(MwId &in sceneId, float opacity, CGameManialinkQuad@ q1, CGameManialinkQuad@ q2, CGameManialinkQuad@ q3, CGameManialinkQuad@ q4, float angle) {
-    if (LastMenuSceneMgr is null) return;
+    if (LastMenuSceneMgr is null || Setting_Mode == BgMode::Disabled) return;
     AllowPlaneReflectEnableCall = true;
     LastMenuSceneMgr.PlaneReflectEnable1(sceneId, opacity, q1, q2, q3, q4, angle);
     LastMenuSceneMgr.PlaneReflectRefresh();

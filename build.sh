@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 # USAGE:
 # - Set PLUGINS_DIR to wherever OpenplanetNext/Plugins lives
 # ./build.sh [dev|release]
@@ -60,7 +62,7 @@ for pluginSrc in ${pluginSources[@]}; do
   PLUGIN_RELEASE_LOC=$PLUGINS_DIR/$RELEASE_NAME
 
   function buildPlugin {
-    7z a ./$BUILD_NAME ./$pluginSrc/* ./LICENSE ./README.md ./external/*
+    7z a ./$BUILD_NAME ./$pluginSrc/* ./LICENSE ./README.md
 
     cp -v $BUILD_NAME $RELEASE_NAME
 
@@ -77,7 +79,7 @@ for pluginSrc in ${pluginSources[@]}; do
       mkdir -p $_build_dest/
       rm -vr $_build_dest/*
       cp -LR -v ./$pluginSrc/* $_build_dest/
-      cp -LR -v ./external/* $_build_dest/
+      # cp -LR -v ./external/* $_build_dest/
       cp -LR -v ./info.toml $_build_dest/
       _copy_exit_code="$?"
       ;;
