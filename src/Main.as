@@ -140,13 +140,13 @@ string InitTmxUrlAndData() {
     // dt -= tmxDateBuffer; // set time 2 days in the past to give enough time for bg to be made
     dt = dt - (dt % SecondsInAMonth);
     uint monthNumber = dt / SecondsInAMonth; // the current month
-    trace('monthNumber:' + monthNumber);
+    // trace('monthNumber:' + monthNumber);
     maxMonth = monthNumber; // track max month for randomized bg
     auto mlsh = GI::GetMenuManialinkScriptHandler();
     for (uint m = 0; m <= maxMonth; m++) {
         string yrMo = MonthNumberToMonthYrStr(m);
         tmxAllMonthYrs.InsertLast(yrMo);
-        trace('inserted tmxAllMonthYrs: ' + yrMo);
+        // trace('inserted tmxAllMonthYrs: ' + yrMo);
         // startnew(CoroCacheUrl, CacheUrl(MakeTmxBgUrlYrMonth(yrMo)));
     }
     return RefreshTmxData();
