@@ -6,7 +6,7 @@ This let's you choose the main menu background. You can choose from:
 * A custom png, jpg, or webm file (via URL)
 * TMX monthly backgrounds (either the current month or a random month)
 
-To return to normal, select "Disabled" in settings and then restart Trackmania (sorry, it's a lot more work to avoid this).
+To return to normal, select "Disabled" in settings.
 
 License: Public Domain
 
@@ -22,14 +22,14 @@ GL HF
 
 - `ComponentProfilePlayerInfo_frame-global`
   - Player profile page (world map background)
-  - BG: `file://Media/Manialinks/Nadeo/TMNext/Menus/PageProfile/UI_profile_background_map_gradients.png` -- child 0 (quad)
-  - `ComponentProfilePlayerInfo_quad-lights` (`file://Media/Manialinks/Nadeo/TMNext/Menus/PageProfile/UI_profile_background_map_lights.png`) -- fake lights that 'shine' on the player's car
-  - `ComponentProfilePlayerInfo_frame-world` (frame holding 3x quads that draw land/sea outlines)
+    - BG: `file://Media/Manialinks/Nadeo/TMNext/Menus/PageProfile/UI_profile_background_map_gradients.png` -- child 0 (quad)
+    - `ComponentProfilePlayerInfo_quad-lights` (`file://Media/Manialinks/Nadeo/TMNext/Menus/PageProfile/UI_profile_background_map_lights.png`) -- fake lights that 'shine' on the player's car
+    - `ComponentProfilePlayerInfo_frame-world` (frame holding 3x quads that draw land/sea outlines)
 
 Media\ManiaApps\Nadeo\TMNext\TrackMania\MainMenu.Script.txt
 
 - club page (activities)
-- main club page bg: `quad-page-background`
-- admin bg: `quad-page-background`
-- example of custom bg: `https://trackmania-prod-nls-file-store-s3.cdn.ubi.com/club/background/17/61cb74f2dc8e4.png?updateTimestamp=1640723706.png`
-- default bg: `file://Media/Manialinks/Nadeo/TMNext/Menus/PageClub/UI_club_background_default.dds`
+  - main club page bg: `quad-page-background`
+  - admin bg: `quad-page-background`
+  - example of custom bg: `https://trackmania-prod-nls-file-store-s3.cdn.ubi.com/club/background/17/61cb74f2dc8e4.png?updateTimestamp=1640723706.png`
+  - default bg: `file://Media/Manialinks/Nadeo/TMNext/Menus/PageClub/UI_club_background_default.dds`

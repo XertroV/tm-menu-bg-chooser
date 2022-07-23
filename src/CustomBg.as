@@ -41,10 +41,27 @@ bool UrlOkayToShowAsBg(const string &in url) {
 
 void CheckAndCacheCustomUrl() {
     @bgCheckReq = null;
-    string url = customImageURL;
+    string url = Setting_CustomImageURL;
     trace("Checking URL: " + url);
     if (CheckUrlExistsAndIsCached(url)) {
         checkedUrls[url] = true;
     }
     Setting_CheckedCurrentCustomImgUrl = true;
 }
+
+/* NOTE: This does not seem to actually cache the image as far as Quad's are concerned.
+   Also, .PreloadImage(url) crashes the game :(
+*/
+
+// class CacheUrl {
+//     string url;
+//     CacheUrl(const string &in _url) {
+//         url = _url;
+//     }
+// }
+
+// void CoroCacheUrl(ref r) {
+//     string url = cast<CacheUrl>(r).url;
+//     trace("Caching URL: " + url);
+//     CheckUrlExistsAndIsCached(url);
+// }
