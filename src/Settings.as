@@ -63,6 +63,9 @@ void RenderMenuBgSettings() {
     if (!Setting_HideCar) AddSimpleTooltip("If the car does not re-appear, go into a new menu and then back again to reload it.");
     Setting_HideCarOnRanked = UI::Checkbox("Hide Car+Reflection on Ranked/Royal Page?", Setting_HideCarOnRanked);
     if (!Setting_HideCarOnRanked) AddSimpleTooltip("If the car does not re-appear, go into a new menu and then back again to reload it.");
+    VPad();
+    UI::TextWrapped("\\$0cfHey! If you want more control over menu reflections, check out *Menu Background Reflections* in the plugin manager.");
+    UI::Markdown("Link: [Menu Background Reflections](https://openplanet.dev/plugin/menu-bg-refls) (opens in browser)");
 
     VPad();
     UI::Separator();

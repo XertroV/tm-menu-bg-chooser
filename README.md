@@ -3,10 +3,12 @@
 This let's you choose the main menu background. You can choose from:
 
 * A custom time of day (morning, day, evening, or night).
-* A custom png, jpg, or webm file (via URL)
-* TMX monthly backgrounds (either the current month or a random month)
+* A custom png, jpg, or webm file (via URL).
+* TMX monthly backgrounds (the current month, a random month, or your choice).
 
 To return to normal, select "Disabled" in settings.
+
+If you want more control over menu reflections, search for [Menu Background Reflections](https://openplanet.dev/plugin/menu-bg-refls) in the plugin manager.
 
 License: Public Domain
 
