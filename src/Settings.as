@@ -9,7 +9,7 @@ enum BgMode {
 }
 
 string[] ModeNames = { "Disabled"
-, "Set Time of Day (TM BGs)"
+, "Set Time of Day (and other TM BGs)"
 , "Use 'Better Loading Screens' BGs"
 , "Trackmania Exchange Monthly BGs"
 , "Custom BG (via URL)"
@@ -103,7 +103,7 @@ void RenderMenuBgSettings() {
 /* TIME OF DAY */
 
 [Setting hidden]
-NadeoMenuBackground Setting_BackgroundChoice = NadeoMenuBackground::Morning;
+NadeoMenuBackground Setting_BackgroundChoice = NadeoMenuBackground::Clouds_Night;
 
 void _DrawTod() {
     UI::PushFont(fontLarger);
