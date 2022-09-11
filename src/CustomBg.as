@@ -51,6 +51,8 @@ void CheckAndCacheCustomUrl() {
 
 /* NOTE: This does not seem to actually cache the image as far as Quad's are concerned.
    Also, .PreloadImage(url) crashes the game :(
+
+    GI::GetMenuManialinkScriptHandler().PreloadImage(url);
 */
 
 // class CacheUrl {

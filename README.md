@@ -35,3 +35,10 @@ Media\ManiaApps\Nadeo\TMNext\TrackMania\MainMenu.Script.txt
   - admin bg: `quad-page-background`
   - example of custom bg: `https://trackmania-prod-nls-file-store-s3.cdn.ubi.com/club/background/17/61cb74f2dc8e4.png?updateTimestamp=1640723706.png`
   - default bg: `file://Media/Manialinks/Nadeo/TMNext/Menus/PageClub/UI_club_background_default.dds`
+
+
+
+
+```
+[0=>"file://Media/Manialinks/Nadeo/TMNext/Menus/PageMatchmakingMain/Background/Royal_Dawn.png", 1=>"file://Media/Manialinks/Nadeo/TMNext/Menus/PageMatchmakingMain/Background/Royal_Midday.png", 2=>"file://Media/Manialinks/Nadeo/TMNext/Menus/PageMatchmakingMain/Background/Royal_Sunset.png", 3=>"file://Media/Manialinks/Nadeo/TMNext/Menus/PageMatchmakingMain/Background/Royal_Night.png"]
+```

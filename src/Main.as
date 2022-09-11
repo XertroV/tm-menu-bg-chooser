@@ -8,12 +8,26 @@
 UI::Font@ fontLarger;
 UI::Font@ fontLargerBold;
 
+string MainMenuOverlayPatched;
+wstring MMOPw;
+
 void Main() {
     // we do stuff through coros so settings have a chance to load
-    startnew(CoroMain);
     @fontLarger = UI::LoadFont("DroidSans.ttf", 18.0f);
     @fontLargerBold = UI::LoadFont("DroidSans-Bold.ttf", 18.0f);
+    startnew(CoroMain);
+    // startnew(SetUpNewBg);
 }
+
+// void SetUpNewBg() {
+//     // get patched bg script
+//     IO::File mmBgScript(IO::FromDataFolder('Plugins/menu-bg-chooser-dev/main-menu-displaymode.Script.txt'), IO::FileMode::Read);
+//     MainMenuOverlayPatched = mmBgScript.ReadToEnd();
+//     MMOPw = wstring(MainMenuOverlayPatched);
+//     print('got patched mm script of length: ' + MainMenuOverlayPatched.Length);
+//     sleep(1000);
+//     SetTypicallyHiddenMenuBgs();
+// }
 
 void OnSettingsChanged() {
     if (TmxBgIsAPastMonth())
@@ -21,6 +35,11 @@ void OnSettingsChanged() {
 }
 
 void CoroMain() {
+    sleep(100);  // wait for settings etc
+    while (!PluginIsEnabled()) {  // just do nothing indefinitely if we're disabled on load.
+        yield();
+    }
+    startnew(SetBLSManifest);
     tmxCurrUrl = InitTmxUrlAndData();
     startnew(CheckAndCacheCustomUrl);
     startnew(LoadCurrTmxData);
@@ -31,23 +50,12 @@ void CoroMain() {
     }
 }
 
-dictionary@ okayTimeOfDays =
-    { {'Morning.png', true}
-    , {'Day.png', true}
-    , {'Evening.png', true}
-    , {'Night.jpg', true}
-};
-
-string[] defaultTodQuadsOrder = {"Night.jpg", "Day.png", "Morning.png", "Evening.png"};
+string[] defaultTodQuadsOrder = {"Night", "Day", "Morning", "Evening"};
 
 // in ranked/royal it seems to be: Night, Midday, Dawn, Sunset
 // mainmenu.script has: Night, Day, Morning, Evening when it calls `PlaneReflectEnable`
 
 CGameManialinkFrame@ menuBgFrame;
-
-bool WillCrashTheGame(const string &in tod) {
-    return !okayTimeOfDays.Exists(tod);
-}
 
 void SetMenuBgImages(bool ignoreDisabled = false, bool ignoreVisibility = false) {
     if (!PluginIsEnabled() && !ignoreDisabled) return;
@@ -94,9 +102,67 @@ void SetMenuBgImages(bool ignoreDisabled = false, bool ignoreVisibility = false)
     }
 }
 
+
+string[] MainBgQuadNames =
+{ "ComponentMainBackground_quad-night"
+, "ComponentMainBackground_quad-day"
+, "ComponentMainBackground_quad-morning"
+, "ComponentMainBackground_quad-evening"
+};
+
+// string KNOWN_GOOD_MM_SCRIPT_ML_PAGE_HASH = "7f243e5799f2df67edc0de4c7503767a";
+
+// void SetTypicallyHiddenMenuBgs() {
+//     if (!PluginIsEnabled()) return;
+//     while (!GI::InMainMenu()) yield();
+
+//     auto mc = GI::GetMenuCustom();
+//     while (mc is null) {
+//         yield();
+//         @mc = GI::GetMenuCustom();
+//     }
+//     auto layers = mc.UILayers;
+//     while (layers.Length < 25) {
+//         trace('layers.Length: ' + layers.Length);
+//         yield();
+//         // layers = mc.UILayers;
+//     }
+
+//     for (uint i = 7; i < layers.Length; i++) {
+//         auto layer = layers[i];
+//         // if (!layer.IsVisible) continue;
+
+//         // if we find the homebackground_frame
+//         if (layer.LocalPage.GetFirstChild("HomeBackground_frame-global") !is null) {
+//             auto mlPageHash = Hash::MD5(layer.ManialinkPageUtf8);
+//             print('mlPageHash: ' + mlPageHash);
+//             if (layer.ManialinkPageUtf8.StartsWith("<!-- patched to enable HomeBackground -->"))
+//                 continue;
+//             if (mlPageHash != KNOWN_GOOD_MM_SCRIPT_ML_PAGE_HASH) {
+//                 warn('main menu script hash has changed -- aborting.');
+//                 continue;
+//             }
+//             layer.ManialinkPage = MMOPw;
+//         }
+
+//         if (layer.IsVisible && layer.LocalPage.GetFirstChild("ComponentMainBackground_frame-global") !is null) {
+//             for (uint qNum = 0; qNum < MainBgQuadNames.Length; qNum++) {
+//                 auto quad = cast<CGameManialinkQuad@>(layer.LocalPage.GetFirstChild(MainBgQuadNames[qNum]));
+//                 if (quad is null) continue;
+//                 quad.ImageUrl = '';
+//                 // quad.Opacity = 0.0;
+//             }
+//         }
+//     }
+// }
+
 void SetQuad(uint ix, CGameManialinkQuad@ quad) {
     if (Setting_Mode == BgMode::SetTimeOfDay) {
         SetQuadTimeOfDay(quad);
+    } else if (Setting_Mode == BgMode::NoBackground) {
+        SetQuadTimeOfDay(quad, 'No Background');
+    } else if (Setting_Mode == BgMode::BetterLoadingScreens) {
+        SetQuadBLS(quad);
     } else if (Setting_Mode == BgMode::TMX) {
         SetQuadTmx(quad);
     } else if (Setting_Mode == BgMode::CustomUrl) {
@@ -106,12 +172,56 @@ void SetQuad(uint ix, CGameManialinkQuad@ quad) {
     }
 }
 
+/*
+file://Media/Manialinks/Nadeo/TMNext/Menus/PageGarage/Garage_background.dds
+
+file://Media/Manialinks/Nadeo/TMNext/Menus/PageMatchmakingMain/Background/Royal_Midday.dds
+file://Media/Manialinks/Nadeo/TMNext/Menus/PageMatchmakingMain/Background/Royal_Night.dds
+file://Media/Manialinks/Nadeo/TMNext/Menus/PageMatchmakingMain/Background/Royal_Dawn.dds
+file://Media/Manialinks/Nadeo/TMNext/Menus/PageMatchmakingMain/Background/Royal_Sunset.dds
+
+file://Media/Manialinks/Nadeo/TMNext/Menus/PageMatchmakingMain/Background/S_Sunset.dds (also {G_,B_} dawn, night, midday)
+
+auto size = Fids::GetFake('Titles/Trackmania/' + vfile).ByteSize;
+if (size > 0) {
+    UI::Text("File Loaded (" + size + "B)");
+} else {
+    UI::Text("File doesn't exist");
+}
+*/
+
+
+bool GameFileExists(const string &in path) {
+    // return Fids::GetGame(path).ByteSize > 0;
+    return Fids::GetFake(path.Replace('file://', 'Titles/Trackmania/')).ByteSize > 0;
+}
+
+
+uint lastWarn = 0;
+
 // include the suffix for timeOfDay
 string GetDefaultBgUrl(const string &in timeOfDay) {
-    if (WillCrashTheGame(timeOfDay)) {
-        throw("timeOfDay var will crash the game! value=" + timeOfDay);
+    if (!MenuBgFiles.Exists(timeOfDay)) {
+        if (lastWarn == 0) {
+            lastWarn = Time::Now;
+            warn('Time of day does not exist: \'' + timeOfDay + '\'');
+            string msg = "Time of day not found: '" + timeOfDay + "'. This should not happen, please msg @XertroV on Openplanet discord.";
+            UI::ShowNotification('Menu BG Chooser', msg, vec4(0.9, 0.6, 0.0, 0.5), 5000);
+        }
+        return string(MenuBgFiles['Morning']);
     }
-    return "file://Media/Manialinks/Nadeo/TMNext/Menus/MainBackgrounds/Background_" + timeOfDay;
+
+    string filePath = string(MenuBgFiles[timeOfDay]);
+    if (filePath != '' && !GameFileExists(filePath)) {
+        if (lastWarn == 0) {
+            lastWarn = Time::Now;
+            warn('Could not find game file that should exist: \'' + filePath + '\'');
+            string msg = "Missing file: " + filePath + ". Menu BG Chooser is exiting to avoid a crash. This should not happen, please msg @XertroV on Openplanet discord.";
+            UI::ShowNotification('Menu BG Chooser', msg, vec4(0.9, 0.6, 0.0, 0.5), 5000);
+        }
+        throw('Aborting to avoid crash: game file does not exist: ' + filePath);
+    }
+    return filePath;
 }
 
 void CheckAndSetQuadImage(CGameManialinkQuad@ quad, const string &in url) {
@@ -121,8 +231,8 @@ void CheckAndSetQuadImage(CGameManialinkQuad@ quad, const string &in url) {
     }
 }
 
-void SetQuadTimeOfDay(CGameManialinkQuad@ quad) {
-    string timeOfDay = MenuBgNames[Setting_BackgroundChoice];
+void SetQuadTimeOfDay(CGameManialinkQuad@ quad, string _timeOfDay = '') {
+    string timeOfDay = _timeOfDay.Length > 0 ? _timeOfDay : MenuBgNames[Setting_BackgroundChoice];
     string url = GetDefaultBgUrl(timeOfDay);
     CheckAndSetQuadImage(quad, url);
 }
@@ -199,6 +309,15 @@ void LoadCurrTmxData() {
 
 void SetQuadTmx(CGameManialinkQuad@ quad) {
     CheckAndSetQuadImage(quad, tmxCurrUrl);
+}
+
+int randBLSIx = -1;
+void SetQuadBLS(CGameManialinkQuad@ quad) {
+    if (!IsBLSInitialized()) return;
+    if (randBLSIx < 0) {
+        randBLSIx = Math::Rand(0, blsManifest.Length);
+    }
+    CheckAndSetQuadImage(quad, blsManifest[randBLSIx]);
 }
 
 void SetQuadCustom(CGameManialinkQuad@ quad) {

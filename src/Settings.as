@@ -2,11 +2,19 @@
 enum BgMode {
     Disabled = 0,
     SetTimeOfDay,
+    BetterLoadingScreens,
     TMX,
-    CustomUrl
+    CustomUrl,
+    NoBackground,
 }
 
-string[] ModeNames = { "Disabled", "Set Time of Day (TM default BG)", "Trackmania Exchange Monthly BG", "Custom BG (via URL)" };
+string[] ModeNames = { "Disabled"
+, "Set Time of Day (TM BGs)"
+, "Use 'Better Loading Screens' BGs"
+, "Trackmania Exchange Monthly BGs"
+, "Custom BG (via URL)"
+, "No Background"
+};
 
 [Setting hidden]
 BgMode Setting_Mode = BgMode::SetTimeOfDay;
@@ -79,26 +87,20 @@ void RenderMenuBgSettings() {
     switch (Setting_Mode) {
         case BgMode::SetTimeOfDay:
             _DrawTod(); break;
+        case BgMode::BetterLoadingScreens:
+            _DrawBLS(); break;
         case BgMode::TMX:
             _DrawTmx(); break;
         case BgMode::CustomUrl:
             _DrawCustom(); break;
+        case BgMode::NoBackground:
+            _DrawNoBg(); break;
         default:
-            _DrawDisabled();
-            return;
+            _DrawDisabled(); return;
     }
 }
 
 /* TIME OF DAY */
-
-enum NadeoMenuBackground {
-    Morning = 0,
-    Day,
-    Evening,
-    Night
-}
-
-string[] MenuBgNames = { 'Morning.png', 'Day.png', 'Evening.png', 'Night.jpg' };
 
 [Setting hidden]
 NadeoMenuBackground Setting_BackgroundChoice = NadeoMenuBackground::Morning;
@@ -113,6 +115,32 @@ void _DrawTod() {
         }
         UI::EndCombo();
     }
+    UI::PopFont();
+}
+
+void _DrawNoBg() {
+    UI::PushFont(fontLarger);
+    UI::Text("Background will be set to transparent.");
+    UI::Text("This is useful to see what is behind the BG.");
+    UI::PopFont();
+}
+
+void _DrawBLS() {
+    UI::PushFont(fontLarger);
+    UI::Text("Background will be set to a random 'Better Loading Screens' image.");
+    UI::Text("Downloaded list of BLS images? " + (IsBLSInitialized() ? 'Yes (' + blsManifest.Length + ' images)' : 'Not yet'));
+
+    if (!IsBLSInitialized())
+        UI::BeginDisabled();
+
+    UI::Text("Current BLS image index: " + randBLSIx);
+    if (UI::Button("Randomize Background")) {
+        randBLSIx = Math::Rand(0, blsManifest.Length);
+    }
+
+    if (!IsBLSInitialized())
+        UI::EndDisabled();
+
     UI::PopFont();
 }
 
@@ -222,11 +250,3 @@ void _DrawCustom() {
 void _DrawDisabled() {
     UI::TextWrapped("Disabled");
 }
-
-/* Reflection Settings */
-
-// [Setting category="BG Reflection" name="Opacity" min="-20.0" max="20.0"]
-// float Setting_BgReflectionOpacity = 0.63;
-
-// [Setting category="BG Reflection" name="Angle" min="-20.0" max="2.0" description="Clipping occurs below -6"]
-// float Setting_BgReflectionAngle = -2.1;
