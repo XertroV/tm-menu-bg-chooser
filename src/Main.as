@@ -16,8 +16,35 @@ void Main() {
     @fontLarger = UI::LoadFont("DroidSans.ttf", 18.0f);
     @fontLargerBold = UI::LoadFont("DroidSans-Bold.ttf", 18.0f);
     startnew(CoroMain);
-    // startnew(SetUpNewBg);
+    // startnew(CheckNewBgNames);
 }
+
+// void CheckNewBgNames() {
+//     string[] newBgs = {
+//         "file://Media/Manialinks/Nadeo/TMNext/Menus/HomeBackground/MenuBackground_Spring_Morning.dds",
+//         "file://Media/Manialinks/Nadeo/TMNext/Menus/HomeBackground/MenuBackground_Spring_Day.dds",
+//         "file://Media/Manialinks/Nadeo/TMNext/Menus/HomeBackground/MenuBackground_Spring_Sunset.dds",
+//         "file://Media/Manialinks/Nadeo/TMNext/Menus/HomeBackground/MenuBackground_Spring_Night.dds",
+//         "file://Media/Manialinks/Nadeo/TMNext/Menus/HomeBackground/MenuBackground_Summer_Morning.dds",
+//         "file://Media/Manialinks/Nadeo/TMNext/Menus/HomeBackground/MenuBackground_Summer_Day.dds",
+//         "file://Media/Manialinks/Nadeo/TMNext/Menus/HomeBackground/MenuBackground_Summer_Sunset.dds",
+//         "file://Media/Manialinks/Nadeo/TMNext/Menus/HomeBackground/MenuBackground_Summer_Night.dds",
+//         "file://Media/Manialinks/Nadeo/TMNext/Menus/HomeBackground/MenuBackground_Fall_Morning.dds",
+//         "file://Media/Manialinks/Nadeo/TMNext/Menus/HomeBackground/MenuBackground_Fall_Day.dds",
+//         "file://Media/Manialinks/Nadeo/TMNext/Menus/HomeBackground/MenuBackground_Fall_Sunset.dds",
+//         "file://Media/Manialinks/Nadeo/TMNext/Menus/HomeBackground/MenuBackground_Fall_Night.dds",
+//         "file://Media/Manialinks/Nadeo/TMNext/Menus/HomeBackground/MenuBackground_Winter_Morning.dds",
+//         "file://Media/Manialinks/Nadeo/TMNext/Menus/HomeBackground/MenuBackground_Winter_Day.dds",
+//         "file://Media/Manialinks/Nadeo/TMNext/Menus/HomeBackground/MenuBackground_Winter_Sunset.dds",
+//         "file://Media/Manialinks/Nadeo/TMNext/Menus/HomeBackground/MenuBackground_Winter_Night.dds",
+//     };
+//     for (uint i = 0; i < newBgs.Length; i++) {
+//         auto item = newBgs[i];
+//         GameFileExists(item);
+//         GameFileExists(item.Replace("MenuBackground", "CubeMap"));
+//     }
+//     GameFileExists("file://Media/Manialinks/Nadeo/TMNext/Menus/HomeBackground/PlaneReflect.dds");
+// }
 
 // void SetUpNewBg() {
 //     // get patched bg script
@@ -192,8 +219,13 @@ if (size > 0) {
 
 
 bool GameFileExists(const string &in path) {
-    // return Fids::GetGame(path).ByteSize > 0;
-    return Fids::GetFake(path.Replace('file://', 'Titles/Trackmania/')).ByteSize > 0;
+    if (path == "") return false;
+    auto theFile = Fids::GetFake(path.Replace('file://', 'Titles/Trackmania/'));
+    if (theFile is null) {
+        warn('null GetFake? ' + path);
+        return false;
+    }
+    return theFile.ByteSize > 0;
 }
 
 
@@ -202,7 +234,7 @@ uint lastWarn = 0;
 // include the suffix for timeOfDay
 string GetDefaultBgUrl(const string &in timeOfDay) {
     if (!MenuBgFiles.Exists(timeOfDay)) {
-        if (lastWarn == 0) {
+        if (lastWarn + 5000 < Time::Now) {
             lastWarn = Time::Now;
             warn('Time of day does not exist: \'' + timeOfDay + '\'');
             string msg = "Time of day not found: '" + timeOfDay + "'. This should not happen, please msg @XertroV on Openplanet discord.";
@@ -213,21 +245,29 @@ string GetDefaultBgUrl(const string &in timeOfDay) {
 
     string filePath = string(MenuBgFiles[timeOfDay]);
     if (filePath != '' && !GameFileExists(filePath)) {
-        if (lastWarn == 0) {
+        if (lastWarn + 5000 < Time::Now) {
             lastWarn = Time::Now;
             warn('Could not find game file that should exist: \'' + filePath + '\'');
             string msg = "Missing file: " + filePath + ". Menu BG Chooser is exiting to avoid a crash. This should not happen, please msg @XertroV on Openplanet discord.";
             UI::ShowNotification('Menu BG Chooser', msg, vec4(0.9, 0.6, 0.0, 0.5), 5000);
+            warn('Aborting to avoid crash: game file does not exist: ' + filePath);
         }
-        throw('Aborting to avoid crash: game file does not exist: ' + filePath);
+        return "";
     }
     return filePath;
 }
+
+float setBgNTimes = 0;
 
 void CheckAndSetQuadImage(CGameManialinkQuad@ quad, const string &in url) {
     if (quad.ImageUrl != url) {
         trace('Set quad ' + quad.Id.GetName() + ' image: ' + url + ' (was: ' + quad.ImageUrl + ')');
         quad.ChangeImageUrl(url);
+        setBgNTimes++;
+        if (Time::Now > 1000 && float(Time::Now) / setBgNTimes > 0.01 && setBgNTimes > 100) {
+            UI::ShowNotification("Menu BG Chooser", "The BG has been set many many more times than one would expect. Something is probably wrong. Aborting to avoid breaking stuff.");
+            throw("set the bg too many times");
+        }
     }
 }
 

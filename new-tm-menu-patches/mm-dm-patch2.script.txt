@@ -1,0 +1,2207 @@
+
+<manialink name="Overlay_MenuBackground" version="3">
+
+<!-- NOTE: You MUST disable the normal main menu by deleting it's manialink code to avoid the game slowing to a crawling FPS -->
+
+<!-- @Component start component-time-of-day -->
+<framemodel id="component-time-of-day">
+		</framemodel>
+<!-- @Component end component-time-of-day -->
+
+<!-- @Component start component-mainbackground -->
+<framemodel id="component-mainbackground">
+<stylesheet>
+	<style class="ComponentMainBackground_background" size="320 180" halign="center" valign="center" keepratio="fit"/>
+</stylesheet>
+
+<frame id="ComponentMainBackground_frame-global">
+	<quad id="ComponentMainBackground_quad-night" image="file://Media/Manialinks/Nadeo/TMNext/Menus/MainBackgrounds/Background_Night.dds" fullscreen="1" opacity="1." class="ComponentMainBackground_background" z-index="0" />
+	<quad id="ComponentMainBackground_quad-day" image="file://Media/Manialinks/Nadeo/TMNext/Menus/MainBackgrounds/Background_Day.dds" fullscreen="1" opacity="0." class="ComponentMainBackground_background" z-index="1" />
+	<quad id="ComponentMainBackground_quad-morning" image="file://Media/Manialinks/Nadeo/TMNext/Menus/MainBackgrounds/Background_Morning.dds" fullscreen="1" opacity="0." class="ComponentMainBackground_background" z-index="2" />
+	<quad id="ComponentMainBackground_quad-evening" image="file://Media/Manialinks/Nadeo/TMNext/Menus/MainBackgrounds/Background_Evening.dds" fullscreen="1" opacity="0." class="ComponentMainBackground_background" z-index="3" />
+</frame>
+		</framemodel>
+<!-- @Component end component-mainbackground -->
+
+<!-- @Component start share-menu-navigation -->
+<framemodel id="share-menu-navigation">
+		</framemodel>
+<!-- @Component end share-menu-navigation -->
+
+<!-- @Component start component-home-background -->
+<framemodel id="component-home-background">
+<stylesheet>
+	<style class="HomeBackground_background" size="320 180" halign="center" valign="center" />
+</stylesheet>
+<frame id="HomeBackground_frame-global" class="component-home-background-container">
+	<!-- quads used to control the plane reflect and cube map -->
+	<frame z-index="0" hidden="1">
+		<quad id="HomeBackground_quad-cube-map-sunrise" size="1 1" image="file://Media/Manialinks/Nadeo/TMNext/Menus/HomeBackground/PlaneReflect.dds" />
+		<quad id="HomeBackground_quad-cube-map-day" size="1 1" image="file://Media/Manialinks/Nadeo/TMNext/Menus/HomeBackground/PlaneReflect.dds" />
+		<quad id="HomeBackground_quad-cube-map-sunset" size="1 1" image="file://Media/Manialinks/Nadeo/TMNext/Menus/HomeBackground/PlaneReflect.dds" />
+		<quad id="HomeBackground_quad-cube-map-night" size="1 1" image="file://Media/Manialinks/Nadeo/TMNext/Menus/HomeBackground/PlaneReflect.dds" />
+	</frame>
+	<frame z-index="1">
+		<quad id="HomeBackground_quad-overflow-old" class="HomeBackground_background" z-index="0" fullscreen="1" />
+		<quad id="HomeBackground_quad-overflow-active" class="HomeBackground_background" z-index="1" fullscreen="1" />
+	</frame>
+	<frame z-index="2">
+		<quad id="HomeBackground_quad-clouds-old" class="HomeBackground_background" z-index="1" />
+		<quad id="HomeBackground_quad-clouds-active" class="HomeBackground_background" z-index="2" />
+		<quad id="HomeBackground_quad-stadium-old" class="HomeBackground_background" z-index="3" />
+		<quad id="HomeBackground_quad-stadium-active" class="HomeBackground_background" z-index="4" />
+		<camera size="320 180" halign="center" valign="center" z-index="5" />
+	</frame>
+</frame>
+		</framemodel>
+<!-- @Component end component-home-background -->
+
+<!-- @Component start router -->
+<framemodel id="router">
+		</framemodel>
+<!-- @Component end router -->
+
+<stylesheet>
+	<style class="background" size="320 180" halign="center" valign="center" opacity="0" hidden="1" />
+</stylesheet>
+<frame id="frame-global" z-index="-10.">
+	<frameinstance id="frame-home-background" modelid="component-home-background" z-index="0" />
+	<frameinstance id="frame-main-background" modelid="component-mainbackground" z-index="1" />
+	<quad id="quad-settings-background" class="background" z-index="2" fullscreen="1" image="file://Media/Manialinks/Nadeo/TMNext/Menus/PageProfile/UI_profile_background_map_gradients.dds" />
+	<quad id="quad-profile-background" class="background" z-index="3" fullscreen="1" image="file://Media/Manialinks/Nadeo/TMNext/Menus/PageProfile/UI_profile_background_map_gradients.dds" />
+	<quad id="quad-black-background" class="background" z-index="3" fullscreen="1" bgcolor="000000" />
+</frame>
+
+<script><!--
+
+// @Component start component-time-of-day
+// /*
+
+#Include "TimeLib" as TimeOfDay_TiL
+#Include "MathLib" as TimeOfDay_ML
+
+#Const TimeOfDay_C_DayPart_Null -1
+#Const TimeOfDay_C_DayPart_NightSunrise 0
+#Const TimeOfDay_C_DayPart_Sunrise 1
+#Const TimeOfDay_C_DayPart_SunriseDay 2
+#Const TimeOfDay_C_DayPart_Day 3
+#Const TimeOfDay_C_DayPart_DaySunset 4
+#Const TimeOfDay_C_DayPart_Sunset 5
+#Const TimeOfDay_C_DayPart_SunsetNight 6
+#Const TimeOfDay_C_DayPart_Night 7
+
+#Const TimeOfDay_C_TimeRange_Null 0.
+#Const TimeOfDay_C_TimeRange_NightSunrise 0.166
+#Const TimeOfDay_C_TimeRange_Sunrise 0.25
+#Const TimeOfDay_C_TimeRange_SunriseDay 0.333
+#Const TimeOfDay_C_TimeRange_Day 0.375
+#Const TimeOfDay_C_TimeRange_DaySunset 0.708
+#Const TimeOfDay_C_TimeRange_Sunset 0.75
+#Const TimeOfDay_C_TimeRange_SunsetNight 0.833
+#Const TimeOfDay_C_TimeRange_Night 0.875
+
+// */
+// @Component end component-time-of-day
+
+// @Component start component-mainbackground
+// /*
+
+#Include "MathLib" as ComponentMainBackground_ML
+#Include "TimeLib" as ComponentMainBackground_TiL
+#Include "TextLib" as ComponentMainBackground_TL
+
+#Struct ComponentMainBackground_K_QuadOpacities {
+	Real Morning;
+	Real Day;
+	Real Evening;
+	Real Night;
+}
+#Struct ComponentMainBackground_K_Controls {
+	CMlQuad Quad_Morning;
+	CMlQuad Quad_Day;
+	CMlQuad Quad_Evening;
+	CMlQuad Quad_Night;
+}
+#Struct ComponentMainBackground_K_State {
+	ComponentMainBackground_K_Controls Controls;
+	Boolean IsVisible;
+	Integer UpdateTimer;
+	Integer DisplayAnimEndTime;
+	Text[Integer] CustomBackgroundImgUrls;
+}
+
+#Struct ComponentMainBackground_K_Event {
+	Integer Type;
+	Real DayProgression;
+	Integer DayPart;
+}
+
+#Const ComponentMainBackground_C_EventType_UpdateOpacities 0
+
+#Const ComponentMainBackground_C_UpdateDelay 30000 //< 30 seconds
+#Const ComponentMainBackground_C_BackgroundTransition 800
+
+#Const ComponentMainBackground_C_DayMaxOpacity 0.8
+
+#Const ComponentMainBackground_C_DayPart_NightSunrise 0
+#Const ComponentMainBackground_C_DayPart_Sunrise 1
+#Const ComponentMainBackground_C_DayPart_SunriseDay 2
+#Const ComponentMainBackground_C_DayPart_Day 3
+#Const ComponentMainBackground_C_DayPart_DaySunset 4
+#Const ComponentMainBackground_C_DayPart_Sunset 5
+#Const ComponentMainBackground_C_DayPart_SunsetNight 6
+#Const ComponentMainBackground_C_DayPart_Night 7
+
+#Const ComponentMainBackground_C_TimeRange_NightSunrise 0.166
+#Const ComponentMainBackground_C_TimeRange_Sunrise 0.25
+#Const ComponentMainBackground_C_TimeRange_SunriseDay 0.333
+#Const ComponentMainBackground_C_TimeRange_Day 0.375
+#Const ComponentMainBackground_C_TimeRange_DaySunset 0.708
+#Const ComponentMainBackground_C_TimeRange_Sunset 0.75
+#Const ComponentMainBackground_C_TimeRange_SunsetNight 0.833
+#Const ComponentMainBackground_C_TimeRange_Night 0.875
+
+#Const ComponentMainBackground_C_DefaultQuadOpacities ComponentMainBackground_K_QuadOpacities {
+	Morning = 0.,
+	Day = 0.,
+	Evening = 0.,
+	Night = 0.
+}
+
+// */
+// @Component end component-mainbackground
+
+// @Component start share-menu-navigation
+// /*
+
+#Include "TextLib" as ShareMenuNavigation_TL
+
+#Const ShareMenuNavigation_C_TextToMenuNavAction [
+	"::EMenuNavAction::Up" => CMlScriptEvent::EMenuNavAction::Up,
+	"::EMenuNavAction::Right" => CMlScriptEvent::EMenuNavAction::Right,
+	"::EMenuNavAction::Left" => CMlScriptEvent::EMenuNavAction::Left,
+	"::EMenuNavAction::Down" => CMlScriptEvent::EMenuNavAction::Down,
+	"::EMenuNavAction::Select" => CMlScriptEvent::EMenuNavAction::Select,
+	"::EMenuNavAction::Cancel" => CMlScriptEvent::EMenuNavAction::Cancel,
+	"::EMenuNavAction::PageUp" => CMlScriptEvent::EMenuNavAction::PageUp,
+	"::EMenuNavAction::PageDown" => CMlScriptEvent::EMenuNavAction::PageDown,
+	"::EMenuNavAction::AppMenu" => CMlScriptEvent::EMenuNavAction::AppMenu,
+	"::EMenuNavAction::Action1" => CMlScriptEvent::EMenuNavAction::Action1,
+	"::EMenuNavAction::Action2" => CMlScriptEvent::EMenuNavAction::Action2,
+	"::EMenuNavAction::ScrollUp" => CMlScriptEvent::EMenuNavAction::ScrollUp,
+	"::EMenuNavAction::ScrollDown" => CMlScriptEvent::EMenuNavAction::ScrollDown
+]
+
+#Struct ShareMenuNavigation_K_MenuNavigationEvent {
+	CMlScriptEvent::EMenuNavAction MenuNavAction;
+	Boolean IsActionAutoRepeat;
+	Integer UserIndex;
+	Boolean IsFromMouse;
+}
+
+// */
+// @Component end share-menu-navigation
+
+// @Component start component-home-background
+// /*
+
+#Include "MathLib" as HomeBackground_ML
+#Include "AnimLib" as HomeBackground_AL
+#Include "TimeLib" as HomeBackground_TiL
+
+#Struct HomeBackground_K_Controls {
+	CMlQuad Quad_CloudsOld;
+	CMlQuad Quad_CloudsActive;
+	CMlQuad Quad_StadiumOld;
+	CMlQuad Quad_StadiumActive;
+	CMlQuad Quad_CubeMapSunrise;
+	CMlQuad Quad_CubeMapDay;
+	CMlQuad Quad_CubeMapSunset;
+	CMlQuad Quad_CubeMapNight;
+	CMlQuad Quad_OverflowActive;
+	CMlQuad Quad_OverflowOld;
+}
+#Struct HomeBackground_K_Light {
+	Integer TransitionStartTime;
+	Integer TransitionDuration;
+	Vec3 TransitionStartColor;
+	Real TransitionStartIntensity;
+	Vec3 TransitionDeltaColor;
+	Real TransitionDeltaIntensity;
+	Vec3 Color;
+	Real Intensity;
+}
+#Struct HomeBackground_K_AnimationReal {
+	Integer StartTime;
+	Integer Duration;
+	Real StartValue;
+	Real DeltaValue;
+	Real CurrentValue;
+}
+#Struct HomeBackground_K_CarState {
+	Integer SteerDirection;
+	HomeBackground_K_AnimationReal SteerAnimation;
+	Integer BoostDirection;
+	Integer BoostCooldownEndTime;
+	HomeBackground_K_AnimationReal BoostAnimation;
+	HomeBackground_K_AnimationReal FlyAnimation;
+}
+#Struct HomeBackground_K_CameraScene {
+	Ident SceneId;
+	Ident CarItemId;
+	Ident PilotItemId;
+	HomeBackground_K_Light Light;
+	HomeBackground_K_CarState CarState;
+}
+#Struct HomeBackground_K_HomeBackground {
+	HomeBackground_K_Controls Controls;
+	Integer OldDayPart;
+	Integer ActiveDayPart;
+	Integer OriginalDayPart;
+	Integer OldSeason;
+	Integer ActiveSeason;
+	Boolean Enabled;
+	Boolean InputsEnabled;
+	Ident[Integer] CloudsVideoIds;
+	Integer TransitionEndTime;
+	Integer EnableDelayEndTime;
+	Boolean EnableDelayValue;
+	HomeBackground_K_CameraScene CameraScene;
+}
+
+#Const HomeBackground_C_Clouds_Sunrise "file://Media/Manialinks/Nadeo/TMNext/Menus/HomeBackground/Clouds_Day.webm" //< `Clouds_Sunrise.webm` clouds are too dark
+#Const HomeBackground_C_Clouds_Day "file://Media/Manialinks/Nadeo/TMNext/Menus/HomeBackground/Clouds_Day.webm"
+#Const HomeBackground_C_Clouds_Sunset "file://Media/Manialinks/Nadeo/TMNext/Menus/HomeBackground/Clouds_Sunset.webm"
+#Const HomeBackground_C_Clouds_Night "file://Media/Manialinks/Nadeo/TMNext/Menus/HomeBackground/Clouds_Night.webm"
+
+#Const HomeBackground_C_Season_Spring 0
+#Const HomeBackground_C_Season_Summer 1
+#Const HomeBackground_C_Season_Fall 2
+#Const HomeBackground_C_Season_Winter 3
+
+#Const HomeBackground_C_Stadium_Sunrise [
+	0 => "file://Media/Manialinks/Nadeo/TMNext/Menus/HomeBackground/MenuBackground_Spring_Morning.dds",
+	1 => "file://Media/Manialinks/Nadeo/TMNext/Menus/HomeBackground/MenuBackground_Summer_Morning.dds",
+	2 => "file://Media/Manialinks/Nadeo/TMNext/Menus/HomeBackground/MenuBackground_Fall_Morning.dds",
+	3 => "file://Media/Manialinks/Nadeo/TMNext/Menus/HomeBackground/MenuBackground_Winter_Morning.dds"
+]
+#Const HomeBackground_C_Stadium_Day [
+	0 => "file://Media/Manialinks/Nadeo/TMNext/Menus/HomeBackground/MenuBackground_Spring_Day.dds",
+	1 => "file://Media/Manialinks/Nadeo/TMNext/Menus/HomeBackground/MenuBackground_Summer_Day.dds",
+	2 => "file://Media/Manialinks/Nadeo/TMNext/Menus/HomeBackground/MenuBackground_Fall_Day.dds",
+	3 => "file://Media/Manialinks/Nadeo/TMNext/Menus/HomeBackground/MenuBackground_Winter_Day.dds"
+]
+#Const HomeBackground_C_Stadium_Sunset [
+	0 => "file://Media/Manialinks/Nadeo/TMNext/Menus/HomeBackground/MenuBackground_Spring_Sunset.dds",
+	1 => "file://Media/Manialinks/Nadeo/TMNext/Menus/HomeBackground/MenuBackground_Summer_Sunset.dds",
+	2 => "file://Media/Manialinks/Nadeo/TMNext/Menus/HomeBackground/MenuBackground_Fall_Sunset.dds",
+	3 => "file://Media/Manialinks/Nadeo/TMNext/Menus/HomeBackground/MenuBackground_Winter_Sunset.dds"
+]
+#Const HomeBackground_C_Stadium_Night [
+	0 => "file://Media/Manialinks/Nadeo/TMNext/Menus/HomeBackground/MenuBackground_Spring_Night.dds",
+	1 => "file://Media/Manialinks/Nadeo/TMNext/Menus/HomeBackground/MenuBackground_Summer_Night.dds",
+	2 => "file://Media/Manialinks/Nadeo/TMNext/Menus/HomeBackground/MenuBackground_Fall_Night.dds",
+	3 => "file://Media/Manialinks/Nadeo/TMNext/Menus/HomeBackground/MenuBackground_Winter_Night.dds"
+]
+
+#Const HomeBackground_C_Overflow_Sunrise "file://Media/Manialinks/Nadeo/TMNext/Menus/MainBackgrounds/Background_Morning.dds"
+#Const HomeBackground_C_Overflow_Day "file://Media/Manialinks/Nadeo/TMNext/Menus/MainBackgrounds/Background_Day.dds"
+#Const HomeBackground_C_Overflow_Sunset "file://Media/Manialinks/Nadeo/TMNext/Menus/MainBackgrounds/Background_Evening.dds"
+#Const HomeBackground_C_Overflow_Night "file://Media/Manialinks/Nadeo/TMNext/Menus/MainBackgrounds/Background_Night.dds"
+
+// The path to the cube map images must not use the classic
+// `file://Media/Path/To/Image.dds` format but instead `Path/To/Image.dds`
+#Const HomeBackground_C_CubeMap_Sunrise [
+	0 => "Manialinks/Nadeo/TMNext/Menus/HomeBackground/CubeMap_Spring_Morning.dds",
+	1 => "Manialinks/Nadeo/TMNext/Menus/HomeBackground/CubeMap_Summer_Morning.dds",
+	2 => "Manialinks/Nadeo/TMNext/Menus/HomeBackground/CubeMap_Fall_Morning.dds",
+	3 => "Manialinks/Nadeo/TMNext/Menus/HomeBackground/CubeMap_Winter_Morning.dds"
+]
+#Const HomeBackground_C_CubeMap_Day [
+	0 => "Manialinks/Nadeo/TMNext/Menus/HomeBackground/CubeMap_Spring_Day.dds",
+	1 => "Manialinks/Nadeo/TMNext/Menus/HomeBackground/CubeMap_Summer_Day.dds",
+	2 => "Manialinks/Nadeo/TMNext/Menus/HomeBackground/CubeMap_Fall_Day.dds",
+	3 => "Manialinks/Nadeo/TMNext/Menus/HomeBackground/CubeMap_Winter_Day.dds"
+]
+#Const HomeBackground_C_CubeMap_Sunset [
+	0 => "Manialinks/Nadeo/TMNext/Menus/HomeBackground/CubeMap_Spring_Sunset.dds",
+	1 => "Manialinks/Nadeo/TMNext/Menus/HomeBackground/CubeMap_Summer_Sunset.dds",
+	2 => "Manialinks/Nadeo/TMNext/Menus/HomeBackground/CubeMap_Fall_Sunset.dds",
+	3 => "Manialinks/Nadeo/TMNext/Menus/HomeBackground/CubeMap_Winter_Sunset.dds"
+]
+#Const HomeBackground_C_CubeMap_Night [
+	0 => "Manialinks/Nadeo/TMNext/Menus/HomeBackground/CubeMap_Spring_Night.dds",
+	1 => "Manialinks/Nadeo/TMNext/Menus/HomeBackground/CubeMap_Summer_Night.dds",
+	2 => "Manialinks/Nadeo/TMNext/Menus/HomeBackground/CubeMap_Fall_Night.dds",
+	3 => "Manialinks/Nadeo/TMNext/Menus/HomeBackground/CubeMap_Winter_Night.dds"
+]
+
+#Const HomeBackground_C_LightColor_Sunrise <0.48, 0.53, 0.6>
+#Const HomeBackground_C_LightColor_Day <0.85, 0.88, 0.92>
+#Const HomeBackground_C_LightColor_Sunset <0.6, 0.47, 0.42>
+#Const HomeBackground_C_LightColor_Night <1., 1., 1.>
+
+#Const HomeBackground_C_LightIntensity_Sunrise 1.
+#Const HomeBackground_C_LightIntensity_Day 1.5
+#Const HomeBackground_C_LightIntensity_Sunset 1.25
+#Const HomeBackground_C_LightIntensity_Night 1.3
+
+#Const HomeBackground_C_DayProgressionUpdateInterval 30000
+#Const HomeBackground_C_DayPartTransitionDuration 5000
+#Const HomeBackground_C_DayPartTransitionFadeInRatio 0.75
+#Const HomeBackground_C_DayPartTransitionFadeOutRatio 0.25
+#Const HomeBackground_C_SceneLayout "Empty" //< Check ManiaScript documentation to see all layouts
+#Const HomeBackground_C_CarModel "CarSport"
+#Const HomeBackground_C_PilotModel "CharacterPilot"
+#Const HomeBackground_C_PilotSkinName "Skins/Models/HelmetPilot/Stadium.zip"
+#Const HomeBackground_C_CameraPosition <1.45, 1.25, -9.>
+#Const HomeBackground_C_CameraRotation 2.
+#Const HomeBackground_C_CameraFOV 30.
+#Const HomeBackground_C_CarPosition <0., 0., 0.>
+#Const HomeBackground_C_CarRotation 140.
+#Const HomeBackground_C_PilotPosition <-0.85, 0., -1.>
+#Const HomeBackground_C_PilotRotation 140.
+#Const HomeBackground_C_PilotInCar True
+#Const HomeBackground_C_PlaneReflectFrontOpacity 0.
+#Const HomeBackground_C_PlaneReflectHorizonAngle -30. //< Use a big angle to make the reflect disappear from the scene
+
+#Const HomeBackground_C_CarState_SteerNeutral 0
+#Const HomeBackground_C_CarState_SteerLeft 1
+#Const HomeBackground_C_CarState_SteerRight 2
+#Const HomeBackground_C_CarState_BoostDown 3
+#Const HomeBackground_C_CarState_BoostUp 4
+
+#Const HomeBackground_C_SteerValue_Neutral 0.
+#Const HomeBackground_C_SteerValue_Left -0.7
+#Const HomeBackground_C_SteerValue_Right 0.7
+
+#Const HomeBackground_C_BoostValue_Up 0.2
+#Const HomeBackground_C_BoostValue_Down 0.
+
+#Const HomeBackground_C_BoostDirection_None 0
+#Const HomeBackground_C_BoostDirection_Down 1
+#Const HomeBackground_C_BoostDirection_Up 2
+
+#Const HomeBackground_C_CarStateSteerAnimationDuration 500
+#Const HomeBackground_C_CarStateBoostAnimationDuration 1000
+#Const HomeBackground_C_CarStateBoostAnimationCooldownDuration 3000
+#Const HomeBackground_C_CarStateFlyAnimationFrequency 0.002
+#Const HomeBackground_C_CarStateFlyAnimationAmplitude 0.02
+
+// */
+// @Component end component-home-background
+
+// @Component start router
+// /*
+
+#Struct K_Router_URL { Text Path; Text QueryString; Text[Text] Query; }
+#Struct K_Router_Route { K_Router_URL URL; K_Router_URL ParentURL; Ident LayerId; Text[] Overlays; Text[] ExcludedOverlays; Integer TransitionIn; Integer TransitionOut; Integer PreloadStatus; }
+#Struct Router_K_URL_Config { Boolean SaveHistory; Boolean ResetPreviousPagesDisplayed; Boolean KeepPreviousPagesDisplayed; Boolean HidePreviousPage; Boolean ShowParentPage; Text[] ExcludeOverlays; }
+
+#Const Router_C_Event_EnteringRoute "Router_EnteringRoute"
+#Const Router_C_Event_LeavingRoute "Router_LeavingRoute"
+
+#Struct Router_K_RouterEvent {
+	Text Type;
+	Text[Text] Data;
+}
+
+// */
+// @Component end router
+
+#Struct K_Controls {
+	CMlFrame Frame_HomeBackground;
+	CMlFrame Frame_MainBackground;
+	CMlQuad Quad_SettingsBackground;
+	CMlQuad Quad_ProfileBackground;
+	CMlQuad Quad_BlackBackground;
+}
+#Struct K_MenuBackground {
+	K_Controls Controls;
+	Integer ActiveDisplayMode;
+	Integer OldDisplayMode;
+	Integer TransitionEndTime;
+}
+
+#Const C_DisplayMode_Null 0
+#Const C_DisplayMode_MainBackground 1
+#Const C_DisplayMode_HomeBackground 2
+#Const C_DisplayMode_SettingsBackground 3
+#Const C_DisplayMode_ProfileBackground 4
+#Const C_DisplayMode_BlackBackground 5
+
+#Const C_BackgroundTransitionDuration 250
+
+
+
+// @Component start component-time-of-day
+// /*
+
+declare Boolean TimeOfDay_G_ForcedDayProgressionEnabled;
+declare Real TimeOfDay_G_ForcedDayProgression;
+
+Real TimeOfDay_GetDayProgression(Real _SpeedMultiplier) {
+	if (TimeOfDay_G_ForcedDayProgressionEnabled) return TimeOfDay_G_ForcedDayProgression;
+	return TimeOfDay_ML::Mod(TimeOfDay_TiL::Clamp01TZDay(TimeOfDay_TiL::GetCurrent()) * _SpeedMultiplier, 0., 1.);
+}
+Real TimeOfDay_GetDayProgression() {
+	if (TimeOfDay_G_ForcedDayProgressionEnabled) return TimeOfDay_G_ForcedDayProgression;
+	return TimeOfDay_TiL::Clamp01TZDay(TimeOfDay_TiL::GetCurrent());
+}
+
+Void TimeOfDay_SetForcedDayProgression(Real _DayProgression) {
+	TimeOfDay_G_ForcedDayProgressionEnabled = True;
+	TimeOfDay_G_ForcedDayProgression = TimeOfDay_ML::Clamp(_DayProgression, 0., 1.);
+}
+Void TimeOfDay_ResetForcedDayProgression() {
+	TimeOfDay_G_ForcedDayProgressionEnabled = False;
+}
+
+Integer TimeOfDay_GetDayPart(Real _DayProgression, Boolean _UseTransitionPart) {
+	if (_UseTransitionPart && _DayProgression >= TimeOfDay_C_TimeRange_NightSunrise && _DayProgression < TimeOfDay_C_TimeRange_Sunrise) {
+		return TimeOfDay_C_DayPart_NightSunrise;
+	} else if (_DayProgression >= TimeOfDay_C_TimeRange_Sunrise && _DayProgression < TimeOfDay_C_TimeRange_Day) {
+		if (_UseTransitionPart && _DayProgression >= TimeOfDay_C_TimeRange_SunriseDay) {
+			return TimeOfDay_C_DayPart_SunriseDay;
+		} else {
+			return TimeOfDay_C_DayPart_Sunrise;
+		}
+	} else if (_DayProgression >= TimeOfDay_C_TimeRange_Day && _DayProgression < TimeOfDay_C_TimeRange_Sunset) {
+		if (_UseTransitionPart && _DayProgression >= TimeOfDay_C_TimeRange_DaySunset) {
+			return TimeOfDay_C_DayPart_DaySunset;
+		} else {
+			return TimeOfDay_C_DayPart_Day;
+		}
+	} else if (_DayProgression >= TimeOfDay_C_TimeRange_Sunset && _DayProgression < TimeOfDay_C_TimeRange_Night) {
+		if (_UseTransitionPart && _DayProgression >= TimeOfDay_C_TimeRange_SunsetNight) {
+			return TimeOfDay_C_DayPart_SunsetNight;
+		} else {
+			return TimeOfDay_C_DayPart_Sunset;
+		}
+	}
+	return TimeOfDay_C_DayPart_Night;
+}
+
+Real TimeOfDay_GetTimeRange(Integer _DayPart) {
+	switch (_DayPart) {
+		case TimeOfDay_C_DayPart_NightSunrise: return TimeOfDay_C_TimeRange_NightSunrise;
+		case TimeOfDay_C_DayPart_Sunrise: return TimeOfDay_C_TimeRange_Sunrise;
+		case TimeOfDay_C_DayPart_SunriseDay: return TimeOfDay_C_TimeRange_SunriseDay;
+		case TimeOfDay_C_DayPart_Day: return TimeOfDay_C_TimeRange_Day;
+		case TimeOfDay_C_DayPart_DaySunset: return TimeOfDay_C_TimeRange_DaySunset;
+		case TimeOfDay_C_DayPart_Sunset: return TimeOfDay_C_TimeRange_Sunset;
+		case TimeOfDay_C_DayPart_SunsetNight: return TimeOfDay_C_TimeRange_SunsetNight;
+		case TimeOfDay_C_DayPart_Night: return TimeOfDay_C_TimeRange_Night;
+	}
+	return TimeOfDay_C_TimeRange_Null;
+}
+
+// */
+// @Component end component-time-of-day
+
+// @Component start component-mainbackground
+// /*
+
+declare ComponentMainBackground_K_State ComponentMainBackground_G_State;
+declare ComponentMainBackground_K_Event[] ComponentMainBackground_PendingEvents;
+
+Real ComponentMainBackground_Private_CalculateOpacity(Real _CurrentHourReal, Real _StartTime, Real _EndTime, Boolean _Ascending) {
+	if (_Ascending) {
+		return (_CurrentHourReal-_StartTime)/(_EndTime-_StartTime);
+	}
+	return (_EndTime-_CurrentHourReal)/(_EndTime-_StartTime);
+}
+
+Void ComponentMainBackground_Private_ApplyOpacities(
+	ComponentMainBackground_K_Controls _Controls,
+	ComponentMainBackground_K_QuadOpacities _QuadOpacities
+) {
+	_Controls.Quad_Morning.Opacity = _QuadOpacities.Morning;
+	_Controls.Quad_Day.Opacity = _QuadOpacities.Day;
+	_Controls.Quad_Evening.Opacity = _QuadOpacities.Evening;
+	_Controls.Quad_Night.Opacity = _QuadOpacities.Night;
+
+	ComponentMainBackground_PendingEvents.add(ComponentMainBackground_K_Event {
+		Type = ComponentMainBackground_C_EventType_UpdateOpacities,
+		DayProgression = TimeOfDay_GetDayProgression(),
+		DayPart = TimeOfDay_GetDayPart(TimeOfDay_GetDayProgression(), True)
+	});
+}
+
+ComponentMainBackground_K_QuadOpacities ComponentMainBackground_Private_GetDayProgressionQuadOpacities(Real _DayProgression) {
+	declare ComponentMainBackground_K_QuadOpacities ComponentMainBackground_QuadOpacities = ComponentMainBackground_C_DefaultQuadOpacities;
+	declare Integer DayPart = TimeOfDay_GetDayPart(_DayProgression, True);
+
+	switch (DayPart) {
+		case ComponentMainBackground_C_DayPart_NightSunrise: {
+			ComponentMainBackground_QuadOpacities.Night = 1.;
+			ComponentMainBackground_QuadOpacities.Morning = ComponentMainBackground_Private_CalculateOpacity(_DayProgression, ComponentMainBackground_C_TimeRange_NightSunrise, ComponentMainBackground_C_TimeRange_Sunrise, True);
+		}
+		case ComponentMainBackground_C_DayPart_Sunrise: {
+			ComponentMainBackground_QuadOpacities.Morning = 1.;
+		}
+		case ComponentMainBackground_C_DayPart_SunriseDay: {
+			ComponentMainBackground_QuadOpacities.Morning = ComponentMainBackground_Private_CalculateOpacity(_DayProgression, ComponentMainBackground_C_TimeRange_SunriseDay, ComponentMainBackground_C_TimeRange_Day, False);
+			ComponentMainBackground_QuadOpacities.Day = 1.;
+		}
+		case ComponentMainBackground_C_DayPart_Day: {
+			ComponentMainBackground_QuadOpacities.Day = 1.;
+		}
+		case ComponentMainBackground_C_DayPart_DaySunset: {
+			ComponentMainBackground_QuadOpacities.Day = 1.;
+			ComponentMainBackground_QuadOpacities.Evening = ComponentMainBackground_Private_CalculateOpacity(_DayProgression, ComponentMainBackground_C_TimeRange_DaySunset, ComponentMainBackground_C_TimeRange_Sunset, True);
+		}
+		case ComponentMainBackground_C_DayPart_Sunset: {
+			ComponentMainBackground_QuadOpacities.Evening = 1.;
+		}
+		case ComponentMainBackground_C_DayPart_SunsetNight: {
+			ComponentMainBackground_QuadOpacities.Evening = ComponentMainBackground_Private_CalculateOpacity(_DayProgression, ComponentMainBackground_C_TimeRange_SunsetNight, ComponentMainBackground_C_TimeRange_Night, False);
+			ComponentMainBackground_QuadOpacities.Night = 1.;
+		}
+		case ComponentMainBackground_C_DayPart_Night: {
+			ComponentMainBackground_QuadOpacities.Night = 1.;
+		}
+	}
+
+	return ComponentMainBackground_QuadOpacities;
+}
+ComponentMainBackground_K_QuadOpacities ComponentMainBackground_Private_GetDayProgressionQuadOpacities() {
+	return ComponentMainBackground_Private_GetDayProgressionQuadOpacities(TimeOfDay_GetDayProgression());
+}
+
+CMlQuad ComponentMainBackground_GetQuadMorning() {
+	return ComponentMainBackground_G_State.Controls.Quad_Morning;
+}
+CMlQuad ComponentMainBackground_GetQuadDay() {
+	return ComponentMainBackground_G_State.Controls.Quad_Day;
+}
+CMlQuad ComponentMainBackground_GetQuadEvening() {
+	return ComponentMainBackground_G_State.Controls.Quad_Evening;
+}
+CMlQuad ComponentMainBackground_GetQuadNight() {
+	return ComponentMainBackground_G_State.Controls.Quad_Night;
+}
+
+Void ComponentMainBackground_SetVisibility(Boolean _IsVisible, Integer _AnimDuration) {
+	ComponentMainBackground_G_State.IsVisible = _IsVisible;
+
+	AnimMgr.Flush(ComponentMainBackground_G_State.Controls.Quad_Morning);
+	AnimMgr.Flush(ComponentMainBackground_G_State.Controls.Quad_Day);
+	AnimMgr.Flush(ComponentMainBackground_G_State.Controls.Quad_Evening);
+	AnimMgr.Flush(ComponentMainBackground_G_State.Controls.Quad_Night);
+
+	if (_AnimDuration <= 1) {
+		ComponentMainBackground_G_State.UpdateTimer = Now + ComponentMainBackground_C_UpdateDelay;
+
+		if (_IsVisible) {
+			ComponentMainBackground_Private_ApplyOpacities(
+				ComponentMainBackground_G_State.Controls,
+				ComponentMainBackground_Private_GetDayProgressionQuadOpacities()
+			);
+		} else {
+			ComponentMainBackground_Private_ApplyOpacities(
+				ComponentMainBackground_G_State.Controls,
+				ComponentMainBackground_C_DefaultQuadOpacities
+			);
+		}
+	} else {
+		ComponentMainBackground_G_State.UpdateTimer = Now + _AnimDuration + ComponentMainBackground_C_UpdateDelay;
+
+		declare ComponentMainBackground_K_QuadOpacities ComponentMainBackground_QuadOpacities = ComponentMainBackground_C_DefaultQuadOpacities;
+		declare Integer Hidden = 1;
+		if (_IsVisible) {
+			ComponentMainBackground_QuadOpacities = ComponentMainBackground_Private_GetDayProgressionQuadOpacities();
+			Hidden = 0;
+		}
+
+		AnimMgr.Add(ComponentMainBackground_G_State.Controls.Quad_Morning, "<a opacity=\""^ComponentMainBackground_QuadOpacities.Morning^"\" hidden=\""^Hidden^"\" />", _AnimDuration, CAnimManager::EAnimManagerEasing::Linear);
+		AnimMgr.Add(ComponentMainBackground_G_State.Controls.Quad_Day, "<a opacity=\""^ComponentMainBackground_QuadOpacities.Day^"\" hidden=\""^Hidden^"\" />", _AnimDuration, CAnimManager::EAnimManagerEasing::Linear);
+		AnimMgr.Add(ComponentMainBackground_G_State.Controls.Quad_Evening, "<a opacity=\""^ComponentMainBackground_QuadOpacities.Evening^"\" hidden=\""^Hidden^"\" />", _AnimDuration, CAnimManager::EAnimManagerEasing::Linear);
+		AnimMgr.Add(ComponentMainBackground_G_State.Controls.Quad_Night, "<a opacity=\""^ComponentMainBackground_QuadOpacities.Night^"\" hidden=\""^Hidden^"\" />", _AnimDuration, CAnimManager::EAnimManagerEasing::Linear);
+	}
+}
+Void ComponentMainBackground_SetVisibility(Boolean _IsVisible) {
+	ComponentMainBackground_SetVisibility(_IsVisible, -1);
+}
+
+
+Void ComponentMainBackground_ChangeBackgroundImages(Text[Integer] _BackgroundsImgUrl, Boolean _Animation) {
+	AnimMgr.Flush(ComponentMainBackground_G_State.Controls.Quad_Morning);
+	AnimMgr.Flush(ComponentMainBackground_G_State.Controls.Quad_Day);
+	AnimMgr.Flush(ComponentMainBackground_G_State.Controls.Quad_Evening);
+	AnimMgr.Flush(ComponentMainBackground_G_State.Controls.Quad_Night);
+
+	if (_Animation) {
+		ComponentMainBackground_G_State.UpdateTimer = Now + (ComponentMainBackground_C_BackgroundTransition * 2) + ComponentMainBackground_C_UpdateDelay;
+		declare ComponentMainBackground_K_QuadOpacities ComponentMainBackground_QuadOpacities = ComponentMainBackground_C_DefaultQuadOpacities;
+
+		AnimMgr.Add(ComponentMainBackground_G_State.Controls.Quad_Morning, "<a opacity=\""^ComponentMainBackground_QuadOpacities.Morning^"\"  />", ComponentMainBackground_C_BackgroundTransition / 2, CAnimManager::EAnimManagerEasing::QuadOut);
+		AnimMgr.Add(ComponentMainBackground_G_State.Controls.Quad_Day, "<a opacity=\""^ComponentMainBackground_QuadOpacities.Day^"\" />", ComponentMainBackground_C_BackgroundTransition / 2, CAnimManager::EAnimManagerEasing::QuadOut);
+		AnimMgr.Add(ComponentMainBackground_G_State.Controls.Quad_Evening, "<a opacity=\""^ComponentMainBackground_QuadOpacities.Evening^"\"  />", ComponentMainBackground_C_BackgroundTransition / 2, CAnimManager::EAnimManagerEasing::QuadOut);
+		AnimMgr.Add(ComponentMainBackground_G_State.Controls.Quad_Night, "<a opacity=\""^ComponentMainBackground_QuadOpacities.Night^"\" />", ComponentMainBackground_C_BackgroundTransition / 2, CAnimManager::EAnimManagerEasing::QuadOut);
+
+		ComponentMainBackground_G_State.DisplayAnimEndTime = Now + ComponentMainBackground_C_BackgroundTransition * 2;
+		ComponentMainBackground_G_State.CustomBackgroundImgUrls = _BackgroundsImgUrl;
+
+		ComponentMainBackground_QuadOpacities = ComponentMainBackground_Private_GetDayProgressionQuadOpacities();
+
+		AnimMgr.Add(ComponentMainBackground_G_State.Controls.Quad_Morning, "<a opacity=\""^ComponentMainBackground_QuadOpacities.Morning^"\" />", ComponentMainBackground_G_State.DisplayAnimEndTime, ComponentMainBackground_C_BackgroundTransition, CAnimManager::EAnimManagerEasing::ExpIn);
+		AnimMgr.Add(ComponentMainBackground_G_State.Controls.Quad_Day, "<a opacity=\""^ComponentMainBackground_QuadOpacities.Day^"\" />", ComponentMainBackground_G_State.DisplayAnimEndTime, ComponentMainBackground_C_BackgroundTransition, CAnimManager::EAnimManagerEasing::ExpIn);
+		AnimMgr.Add(ComponentMainBackground_G_State.Controls.Quad_Evening, "<a opacity=\""^ComponentMainBackground_QuadOpacities.Evening^"\" />", ComponentMainBackground_G_State.DisplayAnimEndTime, ComponentMainBackground_C_BackgroundTransition, CAnimManager::EAnimManagerEasing::ExpIn);
+		AnimMgr.Add(ComponentMainBackground_G_State.Controls.Quad_Night, "<a opacity=\""^ComponentMainBackground_QuadOpacities.Night^"\" />", ComponentMainBackground_G_State.DisplayAnimEndTime, ComponentMainBackground_C_BackgroundTransition, CAnimManager::EAnimManagerEasing::ExpIn);
+	} else {
+		ComponentMainBackground_G_State.DisplayAnimEndTime = -1;
+
+		ComponentMainBackground_Private_ApplyOpacities(
+				ComponentMainBackground_G_State.Controls,
+				ComponentMainBackground_Private_GetDayProgressionQuadOpacities()
+			);
+
+		ComponentMainBackground_G_State.Controls.Quad_Morning.ChangeImageUrl(_BackgroundsImgUrl.get(0, ""));
+		ComponentMainBackground_G_State.Controls.Quad_Day.ChangeImageUrl(_BackgroundsImgUrl.get(1, ""));
+		ComponentMainBackground_G_State.Controls.Quad_Evening.ChangeImageUrl(_BackgroundsImgUrl.get(2, ""));
+		ComponentMainBackground_G_State.Controls.Quad_Night.ChangeImageUrl(_BackgroundsImgUrl.get(3, ""));
+	}
+}
+
+Void ComponentMainBackground_ResetBackgroundImages() {
+	ComponentMainBackground_G_State.Controls.Quad_Morning.ChangeImageUrl("file://Media/Manialinks/Nadeo/TMNext/Menus/MainBackgrounds/Background_Morning.dds");
+	ComponentMainBackground_G_State.Controls.Quad_Day.ChangeImageUrl("file://Media/Manialinks/Nadeo/TMNext/Menus/MainBackgrounds/Background_Day.dds");
+	ComponentMainBackground_G_State.Controls.Quad_Evening.ChangeImageUrl("file://Media/Manialinks/Nadeo/TMNext/Menus/MainBackgrounds/Background_Evening.dds");
+	ComponentMainBackground_G_State.Controls.Quad_Night.ChangeImageUrl("file://Media/Manialinks/Nadeo/TMNext/Menus/MainBackgrounds/Background_Night.dds");
+}
+
+***MainInit***
+***
+declare CMlFrame ComponentMainBackground_Frame_Global;
+***
+
+***MainStart***
+***
+ComponentMainBackground_Frame_Global <=> (Page.GetFirstChild("ComponentMainBackground_frame-global") as CMlFrame);
+ComponentMainBackground_G_State.Controls.Quad_Morning <=> (ComponentMainBackground_Frame_Global.GetFirstChild("ComponentMainBackground_quad-morning") as CMlQuad);
+ComponentMainBackground_G_State.Controls.Quad_Day <=> (ComponentMainBackground_Frame_Global.GetFirstChild("ComponentMainBackground_quad-day") as CMlQuad);
+ComponentMainBackground_G_State.Controls.Quad_Evening <=> (ComponentMainBackground_Frame_Global.GetFirstChild("ComponentMainBackground_quad-evening") as CMlQuad);
+ComponentMainBackground_G_State.Controls.Quad_Night <=> (ComponentMainBackground_Frame_Global.GetFirstChild("ComponentMainBackground_quad-night") as CMlQuad);
+
+ComponentMainBackground_G_State.UpdateTimer = -1;
+ComponentMainBackground_G_State.CustomBackgroundImgUrls = [];
+ComponentMainBackground_G_State.DisplayAnimEndTime = -1;
+
+ComponentMainBackground_SetVisibility(True);
+***
+
+***MainLoop***
+***
+ComponentMainBackground_PendingEvents = [];
+
+if (ComponentMainBackground_G_State.IsVisible && (ComponentMainBackground_G_State.UpdateTimer < 0 || ComponentMainBackground_G_State.UpdateTimer < Now)) {
+	// Only update every 30s
+	ComponentMainBackground_G_State.UpdateTimer = Now + ComponentMainBackground_C_UpdateDelay;
+
+	ComponentMainBackground_Private_ApplyOpacities(
+		ComponentMainBackground_G_State.Controls,
+		ComponentMainBackground_Private_GetDayProgressionQuadOpacities()
+	);
+}
+if (ComponentMainBackground_G_State.DisplayAnimEndTime >= 0 && ComponentMainBackground_G_State.DisplayAnimEndTime <= Now) {
+	ComponentMainBackground_G_State.DisplayAnimEndTime = -1;
+	ComponentMainBackground_G_State.Controls.Quad_Morning.ChangeImageUrl(ComponentMainBackground_G_State.CustomBackgroundImgUrls.get(0, ""));
+	ComponentMainBackground_G_State.Controls.Quad_Day.ChangeImageUrl(ComponentMainBackground_G_State.CustomBackgroundImgUrls.get(1, ""));
+	ComponentMainBackground_G_State.Controls.Quad_Evening.ChangeImageUrl(ComponentMainBackground_G_State.CustomBackgroundImgUrls.get(2, ""));
+	ComponentMainBackground_G_State.Controls.Quad_Night.ChangeImageUrl(ComponentMainBackground_G_State.CustomBackgroundImgUrls.get(3, ""));
+}
+***
+
+// */
+// @Component end component-mainbackground
+
+// @Component start share-menu-navigation
+// /*
+
+declare ShareMenuNavigation_K_MenuNavigationEvent[] ShareMenuNavigation_PendingEvents;
+
+Boolean ShareMenuNavigation_Private_TextActionExists(Text _Text) {
+	return ShareMenuNavigation_C_TextToMenuNavAction.existskey(_Text);
+}
+
+CMlScriptEvent::EMenuNavAction ShareMenuNavigation_Private_TextToAction(Text _Text) {
+	return ShareMenuNavigation_C_TextToMenuNavAction[_Text];
+}
+
+***MainLoop***
+***
+ShareMenuNavigation_PendingEvents = [];
+
+foreach (Event in PendingEvents) {
+	switch (Event.Type) {
+		case CMlScriptEvent::Type::PluginCustomEvent: {
+			switch (Event.CustomEventType) {
+				case "ShareMenuNavigation_MenuNavigation": {
+					if (Event.CustomEventData.count >= 3) {
+						declare TextAction = Event.CustomEventData[0];
+						if (ShareMenuNavigation_Private_TextActionExists(TextAction)) {
+							declare ShareMenuNavigation_K_MenuNavigationEvent MenuNavigationEvent;
+							MenuNavigationEvent.MenuNavAction = ShareMenuNavigation_Private_TextToAction(TextAction);
+							MenuNavigationEvent.IsActionAutoRepeat = (ShareMenuNavigation_TL::ToLowerCase(Event.CustomEventData[1]) == "true");
+							MenuNavigationEvent.UserIndex = ShareMenuNavigation_TL::ToInteger(Event.CustomEventData[2]);
+							MenuNavigationEvent.IsFromMouse = (ShareMenuNavigation_TL::ToLowerCase(Event.CustomEventData[3]) == "true");
+							ShareMenuNavigation_PendingEvents.add(MenuNavigationEvent);
+						}
+					}
+				}
+			}
+		}
+	}
+}
+***
+
+// */
+// @Component end share-menu-navigation
+
+// @Component start component-home-background
+// /*
+
+declare HomeBackground_K_HomeBackground HomeBackground_G_HomeBackground;
+
+Void HomeBackground_Private_AssertOnlyOnInstance() {
+	Page.GetClassChildren("component-home-background-container", Page.MainFrame, True);
+	assert(Page.GetClassChildren_Result.count >= 1, "You included the `HomeBackground` component but did not instanciated it.");
+	assert(Page.GetClassChildren_Result.count <= 1, "You instanciated the `HomeBackground` component several times. Only one instance per page possible.");
+}
+
+Text HomeBackground_Private_GetCloudsVideoUrl(Integer _DayPart) {
+	switch (_DayPart) {
+		case TimeOfDay_C_DayPart_Sunrise: return HomeBackground_C_Clouds_Sunrise;
+		case TimeOfDay_C_DayPart_Day: return HomeBackground_C_Clouds_Day;
+		case TimeOfDay_C_DayPart_Sunset: return HomeBackground_C_Clouds_Sunset;
+		case TimeOfDay_C_DayPart_Night: return HomeBackground_C_Clouds_Night;
+	}
+	return HomeBackground_C_Clouds_Day;
+}
+
+CVideo HomeBackground_Private_GetCloudsVideo(HomeBackground_K_HomeBackground _HomeBackground, Integer _DayPart) {
+	if (_HomeBackground.CloudsVideoIds.existskey(_DayPart) && Video.Videos.existskey(_HomeBackground.CloudsVideoIds[_DayPart])) {
+		return Video.Videos[_HomeBackground.CloudsVideoIds[_DayPart]];
+	}
+	return Null;
+}
+
+Void HomeBackground_Private_StopCloudsVideo(HomeBackground_K_HomeBackground _HomeBackground) {
+	declare CVideo OldCloudsVideo <=> HomeBackground_Private_GetCloudsVideo(_HomeBackground, _HomeBackground.OldDayPart);
+	if (OldCloudsVideo != Null) OldCloudsVideo.Pause();
+	declare CVideo ActiveCloudsVideo <=> HomeBackground_Private_GetCloudsVideo(_HomeBackground, _HomeBackground.ActiveDayPart);
+	if (ActiveCloudsVideo != Null) ActiveCloudsVideo.Pause();
+}
+
+Void HomeBackground_Private_StartCloudsVideo(HomeBackground_K_HomeBackground _HomeBackground) {
+	declare CVideo OldCloudsVideo <=> HomeBackground_Private_GetCloudsVideo(_HomeBackground, _HomeBackground.OldDayPart);
+	if (OldCloudsVideo != Null) OldCloudsVideo.Play();
+	declare CVideo ActiveCloudsVideo <=> HomeBackground_Private_GetCloudsVideo(_HomeBackground, _HomeBackground.ActiveDayPart);
+	if (ActiveCloudsVideo != Null) ActiveCloudsVideo.Play();
+}
+
+Integer HomeBackground_Private_GetCurrentSeason(Text _CurrentTimestamp) {
+	declare Integer CurrentMonth = HomeBackground_TiL::GetLocalDelta_Months(_CurrentTimestamp, "0") % 12;
+	if (CurrentMonth >= 0 && CurrentMonth <= 2) {
+		return HomeBackground_C_Season_Winter;
+	} else if (CurrentMonth >= 3 && CurrentMonth <= 5) {
+		return HomeBackground_C_Season_Spring;
+	} else if (CurrentMonth >= 6 && CurrentMonth <= 8) {
+		return HomeBackground_C_Season_Summer;
+	}
+	return HomeBackground_C_Season_Fall;
+}
+
+Text HomeBackground_Private_GetStadiumImageUrl(Integer _DayPart, Integer _Season) {
+	switch (_DayPart) {
+		case TimeOfDay_C_DayPart_Sunrise: return HomeBackground_C_Stadium_Sunrise.get(_Season, HomeBackground_C_Stadium_Sunrise[0]);
+		case TimeOfDay_C_DayPart_Day: return HomeBackground_C_Stadium_Day.get(_Season, HomeBackground_C_Stadium_Day[0]);
+		case TimeOfDay_C_DayPart_Sunset: return HomeBackground_C_Stadium_Sunset.get(_Season, HomeBackground_C_Stadium_Sunset[0]);
+		case TimeOfDay_C_DayPart_Night: return HomeBackground_C_Stadium_Night.get(_Season, HomeBackground_C_Stadium_Night[0]);
+	}
+	return HomeBackground_C_Stadium_Day[0];
+}
+
+Text HomeBackground_Private_GetOverflowImageUrl(Integer _DayPart) {
+	switch (_DayPart) {
+		case TimeOfDay_C_DayPart_Sunrise: return HomeBackground_C_Overflow_Sunrise;
+		case TimeOfDay_C_DayPart_Day: return HomeBackground_C_Overflow_Day;
+		case TimeOfDay_C_DayPart_Sunset: return HomeBackground_C_Overflow_Sunset;
+		case TimeOfDay_C_DayPart_Night: return HomeBackground_C_Overflow_Night;
+	}
+	return HomeBackground_C_Overflow_Day;
+}
+
+Integer HomeBackground_Private_GetFadeInDuration(Integer _TransitionDuration) {
+	return HomeBackground_ML::NearestInteger(_TransitionDuration * HomeBackground_C_DayPartTransitionFadeInRatio);
+}
+
+Integer HomeBackground_Private_GetFadeOutDuration(Integer _TransitionDuration) {
+	return HomeBackground_ML::NearestInteger(_TransitionDuration * HomeBackground_C_DayPartTransitionFadeOutRatio);
+}
+
+Void HomeBackground_Private_RedrawCameraSceneLight(HomeBackground_K_HomeBackground _HomeBackground) {
+	if (_HomeBackground.CameraScene.SceneId == NullId) return;
+
+	MenuSceneMgr.LightDir0Set(
+		_HomeBackground.CameraScene.SceneId,
+		_HomeBackground.CameraScene.Light.Color,
+		_HomeBackground.CameraScene.Light.Intensity
+	);
+}
+
+Integer HomeBackground_Private_GetCarBoostDirection(HomeBackground_K_CarState _CarState) {
+	if (_CarState.BoostDirection == HomeBackground_C_CarState_BoostUp) {
+		return HomeBackground_C_BoostDirection_Up;
+	} else if (
+		_CarState.BoostDirection == HomeBackground_C_CarState_BoostDown &&
+		_CarState.BoostAnimation.StartTime >= 0 &&
+		Now >= _CarState.BoostAnimation.StartTime &&
+		Now < _CarState.BoostAnimation.StartTime + _CarState.BoostAnimation.Duration
+	) {
+		return HomeBackground_C_BoostDirection_Down;
+	}
+	return HomeBackground_C_BoostDirection_None;
+}
+
+Boolean HomeBackground_Private_GetCarLightOn(HomeBackground_K_HomeBackground _HomeBackground) {
+	return _HomeBackground.ActiveDayPart == TimeOfDay_C_DayPart_Night;
+}
+
+Void HomeBackground_Private_RedrawCarState(HomeBackground_K_HomeBackground _HomeBackground) {
+	if (_HomeBackground.CameraScene.SceneId == NullId || _HomeBackground.CameraScene.CarItemId == NullId) return;
+
+	MenuSceneMgr.ItemSetVehicleState(
+		_HomeBackground.CameraScene.SceneId,
+		_HomeBackground.CameraScene.CarItemId,
+		_HomeBackground.CameraScene.CarState.SteerAnimation.CurrentValue,
+		HomeBackground_Private_GetCarLightOn(_HomeBackground),
+		HomeBackground_Private_GetCarLightOn(_HomeBackground),
+		0,
+		HomeBackground_Private_GetCarBoostDirection(_HomeBackground.CameraScene.CarState),
+		False
+	);
+
+	MenuSceneMgr.ItemSetLocation(
+		_HomeBackground.CameraScene.SceneId,
+		_HomeBackground.CameraScene.CarItemId,
+		HomeBackground_C_CarPosition + <0., _HomeBackground.CameraScene.CarState.BoostAnimation.CurrentValue + _HomeBackground.CameraScene.CarState.FlyAnimation.CurrentValue, 0.>,
+		HomeBackground_C_CarRotation,
+		False
+	);
+}
+
+Void HomeBackground_Private_RedrawCameraSceneCubeMap(HomeBackground_K_HomeBackground _HomeBackground, Integer _TransitionDuration) {
+	declare Integer FadeInDuration = HomeBackground_Private_GetFadeInDuration(_TransitionDuration);
+
+	AnimMgr.Flush(_HomeBackground.Controls.Quad_CubeMapSunrise);
+	AnimMgr.Flush(_HomeBackground.Controls.Quad_CubeMapDay);
+	AnimMgr.Flush(_HomeBackground.Controls.Quad_CubeMapSunset);
+	AnimMgr.Flush(_HomeBackground.Controls.Quad_CubeMapNight);
+
+	if (_HomeBackground.CameraScene.SceneId != NullId) {
+		MenuSceneMgr.CubeMapSetImage2ds(
+			_HomeBackground.CameraScene.SceneId,
+			HomeBackground_C_CubeMap_Sunrise.get(_HomeBackground.ActiveSeason, HomeBackground_C_CubeMap_Sunrise[0]),
+			HomeBackground_C_CubeMap_Day.get(_HomeBackground.ActiveSeason, HomeBackground_C_CubeMap_Day[0]),
+			HomeBackground_C_CubeMap_Sunset.get(_HomeBackground.ActiveSeason, HomeBackground_C_CubeMap_Sunset[0]),
+			HomeBackground_C_CubeMap_Night.get(_HomeBackground.ActiveSeason, HomeBackground_C_CubeMap_Night[0])
+		);
+		MenuSceneMgr.PlaneReflectRefresh();
+	}
+
+	if (FadeInDuration > 0) {
+		switch (_HomeBackground.ActiveDayPart) {
+			case TimeOfDay_C_DayPart_Sunrise: {
+				AnimMgr.Add(_HomeBackground.Controls.Quad_CubeMapSunrise, "<a opacity=\"1\" />", FadeInDuration, CAnimManager::EAnimManagerEasing::QuadIn);
+				AnimMgr.Add(_HomeBackground.Controls.Quad_CubeMapDay, "<a opacity=\"0\" />", FadeInDuration, CAnimManager::EAnimManagerEasing::QuadIn);
+				AnimMgr.Add(_HomeBackground.Controls.Quad_CubeMapSunset, "<a opacity=\"0\" />", FadeInDuration, CAnimManager::EAnimManagerEasing::QuadIn);
+				AnimMgr.Add(_HomeBackground.Controls.Quad_CubeMapNight, "<a opacity=\"0\" />", FadeInDuration, CAnimManager::EAnimManagerEasing::QuadIn);
+			}
+			case TimeOfDay_C_DayPart_Day: {
+				AnimMgr.Add(_HomeBackground.Controls.Quad_CubeMapSunrise, "<a opacity=\"0\" />", FadeInDuration, CAnimManager::EAnimManagerEasing::QuadIn);
+				AnimMgr.Add(_HomeBackground.Controls.Quad_CubeMapDay, "<a opacity=\"1\" />", FadeInDuration, CAnimManager::EAnimManagerEasing::QuadIn);
+				AnimMgr.Add(_HomeBackground.Controls.Quad_CubeMapSunset, "<a opacity=\"0\" />", FadeInDuration, CAnimManager::EAnimManagerEasing::QuadIn);
+				AnimMgr.Add(_HomeBackground.Controls.Quad_CubeMapNight, "<a opacity=\"0\" />", FadeInDuration, CAnimManager::EAnimManagerEasing::QuadIn);
+			}
+			case TimeOfDay_C_DayPart_Sunset: {
+				AnimMgr.Add(_HomeBackground.Controls.Quad_CubeMapSunrise, "<a opacity=\"0\" />", FadeInDuration, CAnimManager::EAnimManagerEasing::QuadIn);
+				AnimMgr.Add(_HomeBackground.Controls.Quad_CubeMapDay, "<a opacity=\"0\" />", FadeInDuration, CAnimManager::EAnimManagerEasing::QuadIn);
+				AnimMgr.Add(_HomeBackground.Controls.Quad_CubeMapSunset, "<a opacity=\"1\" />", FadeInDuration, CAnimManager::EAnimManagerEasing::QuadIn);
+				AnimMgr.Add(_HomeBackground.Controls.Quad_CubeMapNight, "<a opacity=\"0\" />", FadeInDuration, CAnimManager::EAnimManagerEasing::QuadIn);
+			}
+			case TimeOfDay_C_DayPart_Night: {
+				AnimMgr.Add(_HomeBackground.Controls.Quad_CubeMapSunrise, "<a opacity=\"0\" />", FadeInDuration, CAnimManager::EAnimManagerEasing::QuadIn);
+				AnimMgr.Add(_HomeBackground.Controls.Quad_CubeMapDay, "<a opacity=\"0\" />", FadeInDuration, CAnimManager::EAnimManagerEasing::QuadIn);
+				AnimMgr.Add(_HomeBackground.Controls.Quad_CubeMapSunset, "<a opacity=\"0\" />", FadeInDuration, CAnimManager::EAnimManagerEasing::QuadIn);
+				AnimMgr.Add(_HomeBackground.Controls.Quad_CubeMapNight, "<a opacity=\"1\" />", FadeInDuration, CAnimManager::EAnimManagerEasing::QuadIn);
+			}
+		}
+	} else {
+		switch (_HomeBackground.ActiveDayPart) {
+			case TimeOfDay_C_DayPart_Sunrise: {
+				_HomeBackground.Controls.Quad_CubeMapSunrise.Opacity = 1.;
+				_HomeBackground.Controls.Quad_CubeMapDay.Opacity = 0.;
+				_HomeBackground.Controls.Quad_CubeMapSunset.Opacity = 0.;
+				_HomeBackground.Controls.Quad_CubeMapNight.Opacity = 0.;
+			}
+			case TimeOfDay_C_DayPart_Day: {
+				_HomeBackground.Controls.Quad_CubeMapSunrise.Opacity = 0.;
+				_HomeBackground.Controls.Quad_CubeMapDay.Opacity = 1.;
+				_HomeBackground.Controls.Quad_CubeMapSunset.Opacity = 0.;
+				_HomeBackground.Controls.Quad_CubeMapNight.Opacity = 0.;
+			}
+			case TimeOfDay_C_DayPart_Sunset: {
+				_HomeBackground.Controls.Quad_CubeMapSunrise.Opacity = 0.;
+				_HomeBackground.Controls.Quad_CubeMapDay.Opacity = 0.;
+				_HomeBackground.Controls.Quad_CubeMapSunset.Opacity = 1.;
+				_HomeBackground.Controls.Quad_CubeMapNight.Opacity = 0.;
+			}
+			case TimeOfDay_C_DayPart_Night: {
+				_HomeBackground.Controls.Quad_CubeMapSunrise.Opacity = 0.;
+				_HomeBackground.Controls.Quad_CubeMapDay.Opacity = 0.;
+				_HomeBackground.Controls.Quad_CubeMapSunset.Opacity = 0.;
+				_HomeBackground.Controls.Quad_CubeMapNight.Opacity = 1.;
+			}
+		}
+	}
+}
+
+Void HomeBackground_Private_RedrawCloudsDayPart(HomeBackground_K_HomeBackground _HomeBackground, Integer _TransitionDuration) {
+	declare Integer FadeInDuration = HomeBackground_Private_GetFadeInDuration(_TransitionDuration);
+	declare Integer FadeOutDuration = HomeBackground_Private_GetFadeOutDuration(_TransitionDuration);
+
+	AnimMgr.Flush(_HomeBackground.Controls.Quad_CloudsActive);
+	declare CVideo ActiveCloudsVideo <=> HomeBackground_Private_GetCloudsVideo(_HomeBackground, _HomeBackground.ActiveDayPart);
+	if (ActiveCloudsVideo != Null) {
+		_HomeBackground.Controls.Quad_CloudsActive.Image = ActiveCloudsVideo.Image;
+	} else {
+		_HomeBackground.Controls.Quad_CloudsActive.Image = Null;
+	}
+	if (FadeInDuration > 0) {
+		_HomeBackground.Controls.Quad_CloudsActive.Opacity = 0.;
+		AnimMgr.Add(_HomeBackground.Controls.Quad_CloudsActive, "<a opacity=\"1\" />", FadeInDuration, CAnimManager::EAnimManagerEasing::QuadIn);
+	} else {
+		_HomeBackground.Controls.Quad_CloudsActive.Opacity = 1.;
+	}
+
+	AnimMgr.Flush(_HomeBackground.Controls.Quad_CloudsOld);
+	if (FadeOutDuration > 0) {
+		declare CVideo OldCloudsVideo <=> HomeBackground_Private_GetCloudsVideo(_HomeBackground, _HomeBackground.OldDayPart);
+		if (OldCloudsVideo != Null) {
+			_HomeBackground.Controls.Quad_CloudsOld.Image = OldCloudsVideo.Image;
+		} else {
+			_HomeBackground.Controls.Quad_CloudsOld.Image = Null;
+		}
+		_HomeBackground.Controls.Quad_CloudsOld.Visible = True;
+		_HomeBackground.Controls.Quad_CloudsOld.Opacity = 1.;
+		AnimMgr.Add(_HomeBackground.Controls.Quad_CloudsOld, "<a opacity=\"0\" hidden=\"1\" />", Now + FadeInDuration, FadeOutDuration, CAnimManager::EAnimManagerEasing::QuadIn);
+	} else {
+		_HomeBackground.Controls.Quad_CloudsOld.Image = Null;
+		_HomeBackground.Controls.Quad_CloudsOld.Visible = False;
+	}
+}
+
+Void HomeBackground_Private_RedrawStadiumDayPart(HomeBackground_K_HomeBackground _HomeBackground, Integer _TransitionDuration) {
+	declare Integer FadeInDuration = HomeBackground_Private_GetFadeInDuration(_TransitionDuration);
+	declare Integer FadeOutDuration = HomeBackground_Private_GetFadeOutDuration(_TransitionDuration);
+
+	AnimMgr.Flush(_HomeBackground.Controls.Quad_StadiumActive);
+	_HomeBackground.Controls.Quad_StadiumActive.ImageUrl = HomeBackground_Private_GetStadiumImageUrl(_HomeBackground.ActiveDayPart, _HomeBackground.ActiveSeason);
+	if (FadeInDuration > 0) {
+		_HomeBackground.Controls.Quad_StadiumActive.Opacity = 0.;
+		AnimMgr.Add(_HomeBackground.Controls.Quad_StadiumActive, "<a opacity=\"1\" />", FadeInDuration, CAnimManager::EAnimManagerEasing::QuadIn);
+	} else {
+		_HomeBackground.Controls.Quad_StadiumActive.Opacity = 1.;
+	}
+
+	AnimMgr.Flush(_HomeBackground.Controls.Quad_StadiumOld);
+	if (FadeOutDuration > 0) {
+		_HomeBackground.Controls.Quad_StadiumOld.Visible = True;
+		_HomeBackground.Controls.Quad_StadiumOld.Opacity = 1.;
+		_HomeBackground.Controls.Quad_StadiumOld.ImageUrl = HomeBackground_Private_GetStadiumImageUrl(_HomeBackground.OldDayPart, _HomeBackground.OldSeason);
+		AnimMgr.Add(_HomeBackground.Controls.Quad_StadiumOld, "<a opacity=\"0\" hidden=\"1\" />", Now + FadeInDuration, FadeOutDuration, CAnimManager::EAnimManagerEasing::QuadIn);
+	} else {
+		_HomeBackground.Controls.Quad_StadiumOld.ImageUrl = "";
+		_HomeBackground.Controls.Quad_StadiumOld.Visible = False;
+	}
+}
+
+Void HomeBackground_Private_RedrawOverflowDayPart(HomeBackground_K_HomeBackground _HomeBackground, Integer _TransitionDuration) {
+	declare Integer FadeInDuration = HomeBackground_Private_GetFadeInDuration(_TransitionDuration);
+	declare Integer FadeOutDuration = HomeBackground_Private_GetFadeOutDuration(_TransitionDuration);
+
+	AnimMgr.Flush(_HomeBackground.Controls.Quad_OverflowActive);
+	_HomeBackground.Controls.Quad_OverflowActive.ImageUrl = HomeBackground_Private_GetOverflowImageUrl(_HomeBackground.ActiveDayPart);
+	if (FadeInDuration > 0) {
+		_HomeBackground.Controls.Quad_OverflowActive.Opacity = 0.;
+		AnimMgr.Add(_HomeBackground.Controls.Quad_OverflowActive, "<a opacity=\"1\" />", FadeInDuration, CAnimManager::EAnimManagerEasing::QuadIn);
+	} else {
+		_HomeBackground.Controls.Quad_OverflowActive.Opacity = 1.;
+	}
+
+	AnimMgr.Flush(_HomeBackground.Controls.Quad_OverflowOld);
+	if (FadeOutDuration > 0) {
+		_HomeBackground.Controls.Quad_OverflowOld.Visible = True;
+		_HomeBackground.Controls.Quad_OverflowOld.Opacity = 1.;
+		_HomeBackground.Controls.Quad_OverflowOld.ImageUrl = HomeBackground_Private_GetOverflowImageUrl(_HomeBackground.OldDayPart);
+		AnimMgr.Add(_HomeBackground.Controls.Quad_OverflowOld, "<a opacity=\"0\" hidden=\"1\" />", Now + FadeInDuration, FadeOutDuration, CAnimManager::EAnimManagerEasing::QuadIn);
+	} else {
+		_HomeBackground.Controls.Quad_OverflowOld.ImageUrl = "";
+		_HomeBackground.Controls.Quad_OverflowOld.Visible = False;
+	}
+}
+
+Void HomeBackground_Private_RedrawDayPart(HomeBackground_K_HomeBackground _HomeBackground, Integer _TransitionDuration) {
+	HomeBackground_Private_RedrawCloudsDayPart(_HomeBackground, _TransitionDuration);
+	HomeBackground_Private_RedrawStadiumDayPart(_HomeBackground, _TransitionDuration);
+	HomeBackground_Private_RedrawCameraSceneCubeMap(_HomeBackground, _TransitionDuration);
+	HomeBackground_Private_RedrawOverflowDayPart(_HomeBackground, _TransitionDuration);
+}
+
+HomeBackground_K_HomeBackground HomeBackground_Private_UnloadCloudsVideo(HomeBackground_K_HomeBackground _HomeBackground, Integer _DayPart) {
+	if (!_HomeBackground.CloudsVideoIds.existskey(_DayPart)) return _HomeBackground;
+
+	declare HomeBackground_K_HomeBackground HomeBackground = _HomeBackground;
+	if (Video.Videos.existskey(HomeBackground.CloudsVideoIds[_DayPart])) {
+		Video.DestroyVideo(Video.Videos[HomeBackground.CloudsVideoIds[_DayPart]]);
+	}
+	HomeBackground.CloudsVideoIds.removekey(_DayPart);
+
+	return HomeBackground;
+}
+
+HomeBackground_K_HomeBackground HomeBackground_Private_LoadCloudsVideo(HomeBackground_K_HomeBackground _HomeBackground, Integer _DayPart) {
+	if (
+		_HomeBackground.CloudsVideoIds.existskey(_DayPart) &&
+		Video.Videos.existskey(_HomeBackground.CloudsVideoIds[_DayPart])
+	) {
+		return _HomeBackground;
+	}
+
+	declare HomeBackground_K_HomeBackground HomeBackground = _HomeBackground;
+	declare Text VideoUrl = HomeBackground_Private_GetCloudsVideoUrl(_DayPart);
+	if (VideoUrl != "") {
+		declare CVideo CloudsVideo <=> Video.CreateVideo(VideoUrl, True, True);
+		if (CloudsVideo != Null) {
+			CloudsVideo.Play();
+			HomeBackground.CloudsVideoIds[_DayPart] = CloudsVideo.Id;
+		}
+	}
+
+	return HomeBackground;
+}
+
+Vec3 HomeBackground_Private_GetCameraSceneLightColor(Integer _DayPart) {
+	switch (_DayPart) {
+		case TimeOfDay_C_DayPart_Sunrise: return HomeBackground_C_LightColor_Sunrise;
+		case TimeOfDay_C_DayPart_Day: return HomeBackground_C_LightColor_Day;
+		case TimeOfDay_C_DayPart_Sunset: return HomeBackground_C_LightColor_Sunset;
+		case TimeOfDay_C_DayPart_Night: return HomeBackground_C_LightColor_Night;
+	}
+	return HomeBackground_C_LightColor_Day;
+}
+
+Real HomeBackground_Private_GetCameraSceneLightIntensity(Integer _DayPart) {
+	switch (_DayPart) {
+		case TimeOfDay_C_DayPart_Sunrise: return HomeBackground_C_LightIntensity_Sunrise;
+		case TimeOfDay_C_DayPart_Day: return HomeBackground_C_LightIntensity_Day;
+		case TimeOfDay_C_DayPart_Sunset: return HomeBackground_C_LightIntensity_Sunset;
+		case TimeOfDay_C_DayPart_Night: return HomeBackground_C_LightIntensity_Night;
+	}
+	return HomeBackground_C_LightIntensity_Day;
+}
+
+HomeBackground_K_HomeBackground HomeBackground_Private_StartCameraSceneLightAnimation(HomeBackground_K_HomeBackground _HomeBackground, Integer _TransitionDuration) {
+	declare HomeBackground_K_HomeBackground HomeBackground = _HomeBackground;
+
+	if (_TransitionDuration > 0) {
+		HomeBackground.CameraScene.Light.TransitionStartTime = Now;
+		HomeBackground.CameraScene.Light.TransitionDuration = HomeBackground_Private_GetFadeInDuration(_TransitionDuration);
+		HomeBackground.CameraScene.Light.TransitionStartColor = HomeBackground.CameraScene.Light.Color;
+		HomeBackground.CameraScene.Light.TransitionStartIntensity = HomeBackground.CameraScene.Light.Intensity;
+		HomeBackground.CameraScene.Light.TransitionDeltaColor = HomeBackground_Private_GetCameraSceneLightColor(HomeBackground.ActiveDayPart) - HomeBackground.CameraScene.Light.TransitionStartColor;
+		HomeBackground.CameraScene.Light.TransitionDeltaIntensity = HomeBackground_Private_GetCameraSceneLightIntensity(HomeBackground.ActiveDayPart) - HomeBackground.CameraScene.Light.TransitionStartIntensity;
+	} else {
+		HomeBackground.CameraScene.Light.TransitionStartTime = -1;
+		HomeBackground.CameraScene.Light.Color = HomeBackground_Private_GetCameraSceneLightColor(HomeBackground.ActiveDayPart);
+		HomeBackground.CameraScene.Light.Intensity = HomeBackground_Private_GetCameraSceneLightIntensity(HomeBackground.ActiveDayPart);
+		HomeBackground_Private_RedrawCameraSceneLight(HomeBackground);
+	}
+
+	return HomeBackground;
+}
+
+HomeBackground_K_HomeBackground HomeBackground_Private_UpdateCameraSceneLightAnimation(HomeBackground_K_HomeBackground _HomeBackground) {
+	if (_HomeBackground.CameraScene.Light.TransitionStartTime < 0) return _HomeBackground;
+
+	declare HomeBackground_K_HomeBackground HomeBackground = _HomeBackground;
+
+	if (Now >= HomeBackground.CameraScene.Light.TransitionStartTime + HomeBackground.CameraScene.Light.TransitionDuration) {
+		HomeBackground.CameraScene.Light.TransitionStartTime = -1;
+		HomeBackground.CameraScene.Light.Color = HomeBackground.CameraScene.Light.TransitionStartColor + HomeBackground.CameraScene.Light.TransitionDeltaColor;
+		HomeBackground.CameraScene.Light.Intensity = HomeBackground.CameraScene.Light.TransitionStartIntensity + HomeBackground.CameraScene.Light.TransitionDeltaIntensity;
+	} else {
+		HomeBackground.CameraScene.Light.Color.X = HomeBackground_AL::EaseInQuad(
+			Now - HomeBackground.CameraScene.Light.TransitionStartTime,
+			HomeBackground.CameraScene.Light.TransitionStartColor.X,
+			HomeBackground.CameraScene.Light.TransitionDeltaColor.X,
+			HomeBackground.CameraScene.Light.TransitionDuration
+		);
+		HomeBackground.CameraScene.Light.Color.Y = HomeBackground_AL::EaseInQuad(
+			Now - HomeBackground.CameraScene.Light.TransitionStartTime,
+			HomeBackground.CameraScene.Light.TransitionStartColor.Y,
+			HomeBackground.CameraScene.Light.TransitionDeltaColor.Y,
+			HomeBackground.CameraScene.Light.TransitionDuration
+		);
+		HomeBackground.CameraScene.Light.Color.Z = HomeBackground_AL::EaseInQuad(
+			Now - HomeBackground.CameraScene.Light.TransitionStartTime,
+			HomeBackground.CameraScene.Light.TransitionStartColor.Z,
+			HomeBackground.CameraScene.Light.TransitionDeltaColor.Z,
+			HomeBackground.CameraScene.Light.TransitionDuration
+		);
+		HomeBackground.CameraScene.Light.Intensity = HomeBackground_AL::EaseInQuad(
+			Now - HomeBackground.CameraScene.Light.TransitionStartTime,
+			HomeBackground.CameraScene.Light.TransitionStartIntensity,
+			HomeBackground.CameraScene.Light.TransitionDeltaIntensity,
+			HomeBackground.CameraScene.Light.TransitionDuration
+		);
+	}
+
+	HomeBackground_Private_RedrawCameraSceneLight(HomeBackground);
+
+	return HomeBackground;
+}
+
+Boolean HomeBackground_Private_CarStateIsSteer(Integer _CarState) {
+	return (
+		_CarState == HomeBackground_C_CarState_SteerNeutral ||
+		_CarState == HomeBackground_C_CarState_SteerLeft ||
+		_CarState == HomeBackground_C_CarState_SteerRight
+	);
+}
+
+Real HomeBackground_Private_GetCarSteerValue(Integer _CarState) {
+	switch (_CarState) {
+		case HomeBackground_C_CarState_SteerNeutral: return HomeBackground_C_SteerValue_Neutral;
+		case HomeBackground_C_CarState_SteerLeft: return HomeBackground_C_SteerValue_Left;
+		case HomeBackground_C_CarState_SteerRight: return HomeBackground_C_SteerValue_Right;
+	}
+	return HomeBackground_C_SteerValue_Neutral;
+}
+
+HomeBackground_K_HomeBackground HomeBackground_Private_SetCarStateSteer(HomeBackground_K_HomeBackground _HomeBackground, Integer _CarState, Integer _TransitionDuration) {
+	declare HomeBackground_K_HomeBackground HomeBackground = _HomeBackground;
+
+	HomeBackground.CameraScene.CarState.SteerDirection = _CarState;
+	if (_TransitionDuration > 0) {
+		HomeBackground.CameraScene.CarState.SteerAnimation = HomeBackground_K_AnimationReal {
+			StartTime = Now,
+			Duration = HomeBackground_C_CarStateSteerAnimationDuration,
+			StartValue = HomeBackground.CameraScene.CarState.SteerAnimation.CurrentValue,
+			DeltaValue = HomeBackground_Private_GetCarSteerValue(_CarState) - HomeBackground.CameraScene.CarState.SteerAnimation.CurrentValue
+		};
+	} else {
+		HomeBackground.CameraScene.CarState.SteerAnimation = HomeBackground_K_AnimationReal {
+			StartTime = -1,
+			CurrentValue = HomeBackground_Private_GetCarSteerValue(_CarState)
+		};
+		HomeBackground_Private_RedrawCarState(HomeBackground);
+	}
+
+	return HomeBackground;
+}
+
+Boolean HomeBackground_Private_CarStateIsBoost(Integer _CarState) {
+	return (
+		_CarState == HomeBackground_C_CarState_BoostUp ||
+		_CarState == HomeBackground_C_CarState_BoostDown
+	);
+}
+
+Real HomeBackground_Private_GetCarBoostValue(Integer _CarState) {
+	switch (_CarState) {
+		case HomeBackground_C_CarState_BoostUp: return HomeBackground_C_BoostValue_Up;
+		case HomeBackground_C_CarState_BoostDown: return HomeBackground_C_BoostValue_Down;
+	}
+	return HomeBackground_C_BoostValue_Down;
+}
+
+HomeBackground_K_HomeBackground HomeBackground_Private_SetCarStateBoost(HomeBackground_K_HomeBackground _HomeBackground, Integer _CarState, Integer _TransitionDuration) {
+	declare HomeBackground_K_HomeBackground HomeBackground = _HomeBackground;
+
+	HomeBackground.CameraScene.CarState.BoostDirection = _CarState;
+	if (_TransitionDuration > 0) {
+		HomeBackground.CameraScene.CarState.BoostCooldownEndTime = Now + HomeBackground_C_CarStateBoostAnimationCooldownDuration;
+		HomeBackground.CameraScene.CarState.BoostAnimation = HomeBackground_K_AnimationReal {
+			StartTime = Now,
+			Duration = HomeBackground_C_CarStateBoostAnimationDuration,
+			StartValue = HomeBackground.CameraScene.CarState.BoostAnimation.CurrentValue,
+			DeltaValue = HomeBackground_Private_GetCarBoostValue(_CarState) - HomeBackground.CameraScene.CarState.BoostAnimation.CurrentValue
+		};
+		if (HomeBackground.CameraScene.CarState.BoostDirection == HomeBackground_C_CarState_BoostUp) {
+			HomeBackground.CameraScene.CarState.FlyAnimation = HomeBackground_K_AnimationReal {
+				StartTime = Now + HomeBackground.CameraScene.CarState.BoostAnimation.Duration,
+				Duration = -1,
+				StartValue = HomeBackground.CameraScene.CarState.FlyAnimation.CurrentValue
+			};
+		} else if (HomeBackground.CameraScene.CarState.BoostDirection == HomeBackground_C_CarState_BoostDown) {
+			HomeBackground.CameraScene.CarState.FlyAnimation = HomeBackground_K_AnimationReal {
+				StartTime = Now,
+				Duration = HomeBackground.CameraScene.CarState.BoostAnimation.Duration,
+				StartValue = HomeBackground.CameraScene.CarState.FlyAnimation.CurrentValue,
+				DeltaValue = -HomeBackground.CameraScene.CarState.FlyAnimation.CurrentValue
+			};
+		}
+	} else {
+		HomeBackground.CameraScene.CarState.BoostCooldownEndTime = Now;
+		HomeBackground.CameraScene.CarState.BoostAnimation = HomeBackground_K_AnimationReal {
+			StartTime = -1,
+			CurrentValue = HomeBackground_Private_GetCarBoostValue(_CarState)
+		};
+		if (HomeBackground.CameraScene.CarState.BoostDirection == HomeBackground_C_CarState_BoostUp) {
+			HomeBackground.CameraScene.CarState.FlyAnimation = HomeBackground_K_AnimationReal {
+				StartTime = Now,
+				Duration = -1,
+				StartValue = HomeBackground.CameraScene.CarState.FlyAnimation.CurrentValue
+			};
+		} else if (HomeBackground.CameraScene.CarState.BoostDirection == HomeBackground_C_CarState_BoostDown) {
+			HomeBackground.CameraScene.CarState.FlyAnimation = HomeBackground_K_AnimationReal {
+				StartTime = -1,
+				CurrentValue = 0.
+			};
+		}
+		HomeBackground_Private_RedrawCarState(HomeBackground);
+	}
+
+	return HomeBackground;
+}
+
+HomeBackground_K_HomeBackground HomeBackground_Private_SetCarState(HomeBackground_K_HomeBackground _HomeBackground, Integer _CarState, Integer _TransitionDuration) {
+	declare HomeBackground_K_HomeBackground HomeBackground = _HomeBackground;
+
+	if (HomeBackground_Private_CarStateIsSteer(_CarState)) {
+		HomeBackground = HomeBackground_Private_SetCarStateSteer(HomeBackground, _CarState, _TransitionDuration);
+	} else if (HomeBackground_Private_CarStateIsBoost(_CarState)) {
+		HomeBackground = HomeBackground_Private_SetCarStateBoost(HomeBackground, _CarState, _TransitionDuration);
+	}
+
+	return HomeBackground;
+}
+
+HomeBackground_K_AnimationReal HomeBackground_Private_UpdateAnimationReal(HomeBackground_K_AnimationReal _AnimationReal) {
+	if (_AnimationReal.StartTime < 0) return _AnimationReal;
+
+	declare HomeBackground_K_AnimationReal AnimationReal = _AnimationReal;
+
+	if (Now >= AnimationReal.StartTime + AnimationReal.Duration) {
+		AnimationReal.StartTime = -1;
+		AnimationReal.CurrentValue = AnimationReal.StartValue + AnimationReal.DeltaValue;
+	} else {
+		AnimationReal.CurrentValue = HomeBackground_AL::EaseInOutQuad(
+			Now - AnimationReal.StartTime,
+			AnimationReal.StartValue,
+			AnimationReal.DeltaValue,
+			AnimationReal.Duration
+		);
+	}
+
+	return AnimationReal;
+}
+
+HomeBackground_K_AnimationReal HomeBackground_Private_UpdateAnimationFlying(HomeBackground_K_AnimationReal _AnimationReal) {
+	if (_AnimationReal.StartTime < 0) return _AnimationReal;
+
+	declare HomeBackground_K_AnimationReal AnimationReal = _AnimationReal;
+
+	if (AnimationReal.Duration >= 0) {
+		AnimationReal = HomeBackground_Private_UpdateAnimationReal(AnimationReal);
+	} else {
+		AnimationReal.CurrentValue = HomeBackground_C_CarStateFlyAnimationAmplitude * (1. + HomeBackground_ML::Sin((Now - AnimationReal.StartTime) * HomeBackground_C_CarStateFlyAnimationFrequency));
+	}
+
+	return AnimationReal;
+}
+
+HomeBackground_K_HomeBackground HomeBackground_Private_UpdateCarState(HomeBackground_K_HomeBackground _HomeBackground) {
+	if (
+		_HomeBackground.CameraScene.CarState.SteerAnimation.StartTime < 0 &&
+		_HomeBackground.CameraScene.CarState.BoostAnimation.StartTime < 0 &&
+		_HomeBackground.CameraScene.CarState.FlyAnimation.StartTime < 0
+	) {
+		return _HomeBackground;
+	}
+
+	declare HomeBackground_K_HomeBackground HomeBackground = _HomeBackground;
+
+	HomeBackground.CameraScene.CarState.SteerAnimation = HomeBackground_Private_UpdateAnimationReal(HomeBackground.CameraScene.CarState.SteerAnimation);
+	HomeBackground.CameraScene.CarState.BoostAnimation = HomeBackground_Private_UpdateAnimationReal(HomeBackground.CameraScene.CarState.BoostAnimation);
+	HomeBackground.CameraScene.CarState.FlyAnimation = HomeBackground_Private_UpdateAnimationFlying(HomeBackground.CameraScene.CarState.FlyAnimation);
+
+	HomeBackground_Private_RedrawCarState(HomeBackground);
+
+	return HomeBackground;
+}
+
+HomeBackground_K_HomeBackground HomeBackground_Private_CarSteer(HomeBackground_K_HomeBackground _HomeBackground, CMlScriptEvent::EMenuNavAction _NavAction, Integer _TransitionDuration) {
+	if (
+		(_NavAction == CMlScriptEvent::EMenuNavAction::Left && _HomeBackground.CameraScene.CarState.SteerDirection == HomeBackground_C_CarState_SteerLeft) ||
+		(_NavAction == CMlScriptEvent::EMenuNavAction::Right && _HomeBackground.CameraScene.CarState.SteerDirection == HomeBackground_C_CarState_SteerRight)
+	) {
+		return _HomeBackground;
+	}
+
+	declare HomeBackground_K_HomeBackground HomeBackground = _HomeBackground;
+
+	if (_NavAction == CMlScriptEvent::EMenuNavAction::Left) {
+		if (HomeBackground.CameraScene.CarState.SteerDirection == HomeBackground_C_CarState_SteerNeutral) {
+			HomeBackground = HomeBackground_Private_SetCarState(HomeBackground, HomeBackground_C_CarState_SteerLeft, _TransitionDuration);
+		} else if (HomeBackground.CameraScene.CarState.SteerDirection == HomeBackground_C_CarState_SteerRight) {
+			HomeBackground = HomeBackground_Private_SetCarState(HomeBackground, HomeBackground_C_CarState_SteerNeutral, _TransitionDuration);
+		}
+	} else if (_NavAction == CMlScriptEvent::EMenuNavAction::Right) {
+		if (HomeBackground.CameraScene.CarState.SteerDirection == HomeBackground_C_CarState_SteerNeutral) {
+			HomeBackground = HomeBackground_Private_SetCarState(HomeBackground, HomeBackground_C_CarState_SteerRight, _TransitionDuration);
+		} else if (HomeBackground.CameraScene.CarState.SteerDirection == HomeBackground_C_CarState_SteerLeft) {
+			HomeBackground = HomeBackground_Private_SetCarState(HomeBackground, HomeBackground_C_CarState_SteerNeutral, _TransitionDuration);
+		}
+	}
+
+	return HomeBackground;
+}
+
+HomeBackground_K_HomeBackground HomeBackground_Private_CarBoost(HomeBackground_K_HomeBackground _HomeBackground, CMlScriptEvent::EMenuNavAction _NavAction, Integer _TransitionDuration) {
+	if (
+		Now < _HomeBackground.CameraScene.CarState.BoostCooldownEndTime ||
+		(_NavAction == CMlScriptEvent::EMenuNavAction::Up && _HomeBackground.CameraScene.CarState.BoostDirection == HomeBackground_C_CarState_BoostUp) ||
+		(_NavAction == CMlScriptEvent::EMenuNavAction::Down && _HomeBackground.CameraScene.CarState.BoostDirection == HomeBackground_C_CarState_BoostDown)
+	) {
+		return _HomeBackground;
+	}
+
+	declare HomeBackground_K_HomeBackground HomeBackground = _HomeBackground;
+
+	if (_NavAction == CMlScriptEvent::EMenuNavAction::Up) {
+		HomeBackground = HomeBackground_Private_SetCarState(HomeBackground, HomeBackground_C_CarState_BoostUp, _TransitionDuration);
+	} else if (_NavAction == CMlScriptEvent::EMenuNavAction::Down) {
+		HomeBackground = HomeBackground_Private_SetCarState(HomeBackground, HomeBackground_C_CarState_BoostDown, _TransitionDuration);
+	}
+
+	return HomeBackground;
+}
+
+
+HomeBackground_K_HomeBackground HomeBackground_Private_TransitionEnd(HomeBackground_K_HomeBackground _HomeBackground) {
+	if (_HomeBackground.TransitionEndTime < 0) return _HomeBackground;
+
+	declare HomeBackground_K_HomeBackground HomeBackground = _HomeBackground;
+
+	HomeBackground.TransitionEndTime = -1;
+	if (HomeBackground.OldDayPart != HomeBackground.ActiveDayPart) {
+		HomeBackground = HomeBackground_Private_UnloadCloudsVideo(HomeBackground, HomeBackground.OldDayPart);
+	}
+
+	return HomeBackground;
+}
+
+HomeBackground_K_HomeBackground HomeBackground_Private_TransitionStart(HomeBackground_K_HomeBackground _HomeBackground, Integer _TransitionDuration) {
+	declare HomeBackground_K_HomeBackground HomeBackground = _HomeBackground;
+
+	HomeBackground.TransitionEndTime = Now + _TransitionDuration;
+	HomeBackground = HomeBackground_Private_LoadCloudsVideo(HomeBackground, HomeBackground.ActiveDayPart);
+	HomeBackground_Private_RedrawDayPart(HomeBackground, _TransitionDuration);
+	HomeBackground = HomeBackground_Private_StartCameraSceneLightAnimation(HomeBackground, _TransitionDuration);
+
+	if (Now >= HomeBackground.TransitionEndTime) {
+		HomeBackground = HomeBackground_Private_TransitionEnd(HomeBackground);
+	}
+
+	return HomeBackground;
+}
+
+HomeBackground_K_HomeBackground HomeBackground_Private_UpdateDayPartAndSeason(HomeBackground_K_HomeBackground _HomeBackground, Boolean _IsInit, Integer _DayPart, Integer _Season) {
+	if (!_IsInit && _HomeBackground.ActiveDayPart == _DayPart && _HomeBackground.ActiveSeason == _Season) return _HomeBackground;
+
+	declare HomeBackground_K_HomeBackground HomeBackground = _HomeBackground;
+	HomeBackground = HomeBackground_Private_TransitionEnd(HomeBackground);
+	HomeBackground.OldDayPart = HomeBackground.ActiveDayPart;
+	HomeBackground.ActiveDayPart = _DayPart;
+	HomeBackground.OldSeason = HomeBackground.ActiveSeason;
+	HomeBackground.ActiveSeason = _Season;
+	if (_IsInit) {
+		HomeBackground = HomeBackground_Private_TransitionStart(HomeBackground, 0);
+	} else {
+		HomeBackground = HomeBackground_Private_TransitionStart(HomeBackground, HomeBackground_C_DayPartTransitionDuration);
+	}
+	HomeBackground_Private_RedrawCarState(HomeBackground);
+
+	return HomeBackground;
+}
+HomeBackground_K_HomeBackground HomeBackground_Private_UpdateDayPartAndSeason(HomeBackground_K_HomeBackground _HomeBackground, Boolean _IsInit) {
+	return HomeBackground_Private_UpdateDayPartAndSeason(
+		_HomeBackground,
+		_IsInit,
+		TimeOfDay_GetDayPart(TimeOfDay_GetDayProgression(), False),
+		HomeBackground_Private_GetCurrentSeason(HomeBackground_TiL::GetCurrent())
+	);
+}
+
+HomeBackground_K_HomeBackground HomeBackground_Private_SelectDayPart(HomeBackground_K_HomeBackground _HomeBackground, CMlScriptEvent::EMenuNavAction _NavAction) {
+	if (_HomeBackground.TransitionEndTime >= 0) return _HomeBackground;
+
+	declare HomeBackground_K_HomeBackground HomeBackground = _HomeBackground;
+
+	declare Integer[] DayParts = [
+		TimeOfDay_C_DayPart_Sunrise,
+		TimeOfDay_C_DayPart_Day,
+		TimeOfDay_C_DayPart_Sunset,
+		TimeOfDay_C_DayPart_Night
+	];
+	declare Integer Key = HomeBackground_ML::Max(0, DayParts.keyof(HomeBackground.ActiveDayPart));
+	if (_NavAction == CMlScriptEvent::EMenuNavAction::PageUp) {
+		Key -= 1;
+	} else if (_NavAction == CMlScriptEvent::EMenuNavAction::PageDown) {
+		Key += 1;
+	}
+	if (Key < 0) Key = DayParts.count - 1;
+	else if (Key > DayParts.count - 1) Key = 0;
+
+	if (
+		HomeBackground.OriginalDayPart != TimeOfDay_C_DayPart_Null &&
+		HomeBackground.OriginalDayPart == DayParts[Key]
+	) {
+		HomeBackground.OriginalDayPart = TimeOfDay_C_DayPart_Null;
+		TimeOfDay_ResetForcedDayProgression();
+	} else {
+		if (HomeBackground.OriginalDayPart == TimeOfDay_C_DayPart_Null) {
+			HomeBackground.OriginalDayPart = HomeBackground.ActiveDayPart;
+		}
+		TimeOfDay_SetForcedDayProgression(TimeOfDay_GetTimeRange(DayParts[Key]));
+	}
+
+	HomeBackground = HomeBackground_Private_UpdateDayPartAndSeason(HomeBackground, False);
+
+	return HomeBackground;
+}
+
+HomeBackground_K_HomeBackground HomeBackground_Private_CreateCameraSceneCar(HomeBackground_K_HomeBackground _HomeBackground) {
+	if (_HomeBackground.CameraScene.CarItemId != NullId) return _HomeBackground;
+
+	declare HomeBackground_K_HomeBackground HomeBackground = _HomeBackground;
+
+	if (LocalUser != Null) {
+		HomeBackground.CameraScene.CarItemId = MenuSceneMgr.ItemCreate(
+			HomeBackground.CameraScene.SceneId,
+			HomeBackground_C_CarModel,
+			LocalUser.Model_CarSport_SkinName,
+			LocalUser.Model_CarSport_SkinUrl
+		);
+	} else {
+		HomeBackground.CameraScene.CarItemId = MenuSceneMgr.ItemCreate(
+			HomeBackground.CameraScene.SceneId,
+			HomeBackground_C_CarModel,
+			"",
+			""
+		);
+	}
+	if (HomeBackground.CameraScene.CarItemId != NullId) {
+		MenuSceneMgr.ItemSetLocation(
+			HomeBackground.CameraScene.SceneId,
+			HomeBackground.CameraScene.CarItemId,
+			HomeBackground_C_CarPosition,
+			HomeBackground_C_CarRotation,
+			False
+		);
+	}
+
+	return HomeBackground;
+}
+
+HomeBackground_K_HomeBackground HomeBackground_Private_CreateCameraScenePilot(HomeBackground_K_HomeBackground _HomeBackground) {
+	if (_HomeBackground.CameraScene.PilotItemId != NullId) return _HomeBackground;
+
+	declare HomeBackground_K_HomeBackground HomeBackground = _HomeBackground;
+
+	HomeBackground.CameraScene.PilotItemId = MenuSceneMgr.ItemCreate(
+		HomeBackground.CameraScene.SceneId,
+		HomeBackground_C_PilotModel,
+		HomeBackground_C_PilotSkinName,
+		""
+	);
+	if (HomeBackground.CameraScene.PilotItemId != NullId) {
+		if (HomeBackground_C_PilotInCar && HomeBackground.CameraScene.CarItemId != NullId) {
+			MenuSceneMgr.ItemAttachTo(HomeBackground.CameraScene.SceneId, HomeBackground.CameraScene.PilotItemId, HomeBackground.CameraScene.CarItemId);
+		} else {
+			MenuSceneMgr.ItemSetLocation(
+				HomeBackground.CameraScene.SceneId,
+				HomeBackground.CameraScene.PilotItemId,
+				HomeBackground_C_PilotPosition,
+				HomeBackground_C_PilotRotation,
+				False
+			);
+		}
+	}
+
+	return HomeBackground;
+}
+
+HomeBackground_K_HomeBackground HomeBackground_Private_CreateCameraScene(HomeBackground_K_HomeBackground _HomeBackground) {
+	if (_HomeBackground.CameraScene.SceneId != NullId) return _HomeBackground;
+
+	declare HomeBackground_K_HomeBackground HomeBackground = _HomeBackground;
+	HomeBackground.CameraScene.SceneId = MenuSceneMgr.SceneCreate(HomeBackground_C_SceneLayout);
+
+	if (HomeBackground.CameraScene.SceneId != NullId) {
+		MenuSceneMgr.CameraSetLocation(
+			HomeBackground.CameraScene.SceneId,
+			HomeBackground_C_CameraPosition,
+			HomeBackground_C_CameraRotation,
+			HomeBackground_C_CameraFOV
+		);
+
+		// The cube map use the opacity of the plane reflect quads to determine which image to use
+		// They are in the same order: Quad0 -> RelName0, Quad1 -> RelName1, ...
+		MenuSceneMgr.PlaneReflectEnable(
+			HomeBackground.CameraScene.SceneId,
+			HomeBackground_C_PlaneReflectFrontOpacity,
+			HomeBackground.Controls.Quad_CubeMapSunrise,
+			HomeBackground.Controls.Quad_CubeMapDay,
+			HomeBackground.Controls.Quad_CubeMapSunset,
+			HomeBackground.Controls.Quad_CubeMapNight,
+			HomeBackground_C_PlaneReflectHorizonAngle
+		);
+		MenuSceneMgr.PlaneReflectRefresh();
+
+		HomeBackground = HomeBackground_Private_CreateCameraSceneCar(HomeBackground);
+		HomeBackground = HomeBackground_Private_CreateCameraScenePilot(HomeBackground);
+
+		HomeBackground = HomeBackground_Private_StartCameraSceneLightAnimation(HomeBackground, 0);
+		HomeBackground_Private_RedrawCameraSceneCubeMap(HomeBackground, 0);
+	}
+
+	return HomeBackground;
+}
+
+HomeBackground_K_HomeBackground HomeBackground_Private_DestroyCameraScene(HomeBackground_K_HomeBackground _HomeBackground) {
+	if (_HomeBackground.CameraScene.SceneId == NullId) return _HomeBackground;
+
+	declare HomeBackground_K_HomeBackground HomeBackground = _HomeBackground;
+
+	if (HomeBackground.CameraScene.PilotItemId != NullId) {
+		MenuSceneMgr.ItemDestroy(HomeBackground.CameraScene.SceneId, HomeBackground.CameraScene.PilotItemId);
+		HomeBackground.CameraScene.PilotItemId = NullId;
+	}
+	if (HomeBackground.CameraScene.CarItemId != NullId) {
+		MenuSceneMgr.ItemDestroy(HomeBackground.CameraScene.SceneId, HomeBackground.CameraScene.CarItemId);
+		HomeBackground.CameraScene.CarItemId = NullId;
+	}
+	MenuSceneMgr.SceneDestroy(HomeBackground.CameraScene.SceneId);
+	HomeBackground.CameraScene.SceneId = NullId;
+
+	HomeBackground.CameraScene.Light.TransitionStartTime = -1;
+	HomeBackground.CameraScene.CarState.SteerAnimation.StartTime = -1;
+	HomeBackground.CameraScene.CarState.BoostAnimation.StartTime = -1;
+	HomeBackground.CameraScene.CarState.FlyAnimation.StartTime = -1;
+
+	return HomeBackground;
+}
+
+HomeBackground_K_HomeBackground HomeBackground_Private_Enable(HomeBackground_K_HomeBackground _HomeBackground, Boolean _IsInit, Boolean _Enabled) {
+	if (!_IsInit && _HomeBackground.EnableDelayEndTime < 0 && _HomeBackground.Enabled == _Enabled) {
+		return _HomeBackground;
+	}
+
+	declare HomeBackground_K_HomeBackground HomeBackground = _HomeBackground;
+
+	if (!_IsInit && _HomeBackground.EnableDelayEndTime >= 0 && _HomeBackground.Enabled == _Enabled) {
+		HomeBackground.EnableDelayEndTime = -1;
+		return HomeBackground;
+	}
+
+	HomeBackground.Enabled = _Enabled;
+	HomeBackground.EnableDelayEndTime = -1;
+
+	if (_IsInit || HomeBackground.Enabled) {
+		HomeBackground = HomeBackground_Private_UpdateDayPartAndSeason(HomeBackground, True);
+	}
+	if (HomeBackground.Enabled) {
+		HomeBackground_Private_StartCloudsVideo(HomeBackground);
+		HomeBackground = HomeBackground_Private_CreateCameraScene(HomeBackground);
+		HomeBackground = HomeBackground_Private_SetCarState(HomeBackground, HomeBackground.CameraScene.CarState.SteerDirection, 0);
+		HomeBackground = HomeBackground_Private_SetCarState(HomeBackground, HomeBackground.CameraScene.CarState.BoostDirection, 0);
+	} else {
+		HomeBackground_Private_StopCloudsVideo(HomeBackground);
+		HomeBackground = HomeBackground_Private_DestroyCameraScene(HomeBackground);
+	}
+
+	return HomeBackground;
+}
+
+HomeBackground_K_HomeBackground HomeBackground_Private_EnableWithDelay(HomeBackground_K_HomeBackground _HomeBackground, Boolean _Enabled, Integer _Delay) {
+	declare HomeBackground_K_HomeBackground HomeBackground = _HomeBackground;
+
+	if (_Delay <= 0) {
+		HomeBackground.EnableDelayEndTime = -1;
+		HomeBackground = HomeBackground_Private_Enable(_HomeBackground, False, _Enabled);
+	} else {
+		HomeBackground.EnableDelayEndTime = Now + _Delay;
+		HomeBackground.EnableDelayValue = _Enabled;
+	}
+
+	return HomeBackground;
+}
+
+HomeBackground_K_HomeBackground HomeBackground_Private_Initialize(HomeBackground_K_HomeBackground _HomeBackground) {
+	return HomeBackground_Private_Enable(_HomeBackground, True, False);
+}
+
+Void HomeBackground_Enable(Boolean _Enabled) {
+	HomeBackground_G_HomeBackground = HomeBackground_Private_Enable(HomeBackground_G_HomeBackground, False, _Enabled);
+}
+
+Void HomeBackground_EnableWidthDelay(Boolean _Enabled, Integer _Delay) {
+	HomeBackground_G_HomeBackground = HomeBackground_Private_EnableWithDelay(HomeBackground_G_HomeBackground, _Enabled, _Delay);
+}
+
+Void HomeBackground_EnableInputs(Boolean _Enabled) {
+	HomeBackground_G_HomeBackground.InputsEnabled = _Enabled;
+}
+
+***MainInit***
+***
+HomeBackground_Private_AssertOnlyOnInstance();
+
+declare CMlFrame Frame_Global;
+
+declare Integer HomeBackground_NextDayProgressionUpdateTime;
+***
+
+***MainStart***
+***
+Frame_Global <=> (Page.GetFirstChild("HomeBackground_frame-global") as CMlFrame);
+HomeBackground_G_HomeBackground = HomeBackground_K_HomeBackground {
+	Controls = HomeBackground_K_Controls {
+		Quad_CloudsOld = (Frame_Global.GetFirstChild("HomeBackground_quad-clouds-old") as CMlQuad),
+		Quad_CloudsActive = (Frame_Global.GetFirstChild("HomeBackground_quad-clouds-active") as CMlQuad),
+		Quad_StadiumOld = (Frame_Global.GetFirstChild("HomeBackground_quad-stadium-old") as CMlQuad),
+		Quad_StadiumActive = (Frame_Global.GetFirstChild("HomeBackground_quad-stadium-active") as CMlQuad),
+		Quad_CubeMapSunrise = (Frame_Global.GetFirstChild("HomeBackground_quad-cube-map-sunrise") as CMlQuad),
+		Quad_CubeMapDay = (Frame_Global.GetFirstChild("HomeBackground_quad-cube-map-day") as CMlQuad),
+		Quad_CubeMapSunset = (Frame_Global.GetFirstChild("HomeBackground_quad-cube-map-sunset") as CMlQuad),
+		Quad_CubeMapNight = (Frame_Global.GetFirstChild("HomeBackground_quad-cube-map-night") as CMlQuad),
+		Quad_OverflowOld = (Frame_Global.GetFirstChild("HomeBackground_quad-overflow-old") as CMlQuad),
+		Quad_OverflowActive = (Frame_Global.GetFirstChild("HomeBackground_quad-overflow-active") as CMlQuad)
+	},
+	Enabled = False,
+	InputsEnabled = True,
+	OldDayPart = TimeOfDay_C_DayPart_Night,
+	ActiveDayPart = TimeOfDay_C_DayPart_Night,
+	OriginalDayPart = TimeOfDay_C_DayPart_Null,
+	OldSeason = HomeBackground_C_Season_Spring,
+	ActiveSeason = HomeBackground_C_Season_Spring,
+	CloudsVideoIds = [],
+	TransitionEndTime = -1,
+	EnableDelayEndTime = -1,
+	EnableDelayValue = False,
+	CameraScene = HomeBackground_K_CameraScene {
+		SceneId = NullId,
+		CarItemId = NullId,
+		PilotItemId = NullId,
+		Light = HomeBackground_K_Light {
+			TransitionStartTime = -1,
+			TransitionDuration = 0,
+			TransitionStartColor = HomeBackground_C_LightColor_Night,
+			TransitionStartIntensity = HomeBackground_C_LightIntensity_Night,
+			TransitionDeltaColor = <0., 0., 0.>,
+			TransitionDeltaIntensity = 0.,
+			Color = HomeBackground_C_LightColor_Night,
+			Intensity = HomeBackground_C_LightIntensity_Night
+		},
+		CarState = HomeBackground_K_CarState {
+			SteerDirection = HomeBackground_C_CarState_SteerNeutral,
+			SteerAnimation = HomeBackground_K_AnimationReal {
+				StartTime = -1,
+				Duration = 0,
+				StartValue = HomeBackground_C_SteerValue_Neutral,
+				DeltaValue = 0.,
+				CurrentValue = HomeBackground_C_SteerValue_Neutral
+			},
+			BoostDirection = HomeBackground_C_CarState_BoostDown,
+			BoostCooldownEndTime = 0,
+			BoostAnimation = HomeBackground_K_AnimationReal {
+				StartTime = -1,
+				Duration = 0,
+				StartValue = HomeBackground_C_BoostValue_Down,
+				DeltaValue = 0.,
+				CurrentValue = HomeBackground_C_BoostValue_Down
+			},
+			FlyAnimation = HomeBackground_K_AnimationReal {
+				StartTime = -1,
+				Duration = 0,
+				StartValue = 0.,
+				DeltaValue = 0.,
+				CurrentValue = 0.
+			}
+		}
+	}
+};
+
+HomeBackground_NextDayProgressionUpdateTime = Now + HomeBackground_C_DayProgressionUpdateInterval;
+
+HomeBackground_G_HomeBackground = HomeBackground_Private_Initialize(HomeBackground_G_HomeBackground);
+***
+
+***MainLoop***
+***
+if (PageIsVisible && HomeBackground_G_HomeBackground.Enabled) {
+	if (Now >= HomeBackground_NextDayProgressionUpdateTime) {
+		HomeBackground_NextDayProgressionUpdateTime = Now + HomeBackground_C_DayProgressionUpdateInterval;
+		HomeBackground_G_HomeBackground = HomeBackground_Private_UpdateDayPartAndSeason(HomeBackground_G_HomeBackground, False);
+	}
+
+	if (HomeBackground_G_HomeBackground.InputsEnabled) {
+		foreach (Event in ShareMenuNavigation_PendingEvents) {
+			if (
+				Event.MenuNavAction == CMlScriptEvent::EMenuNavAction::Left ||
+				Event.MenuNavAction == CMlScriptEvent::EMenuNavAction::Right
+			) {
+				HomeBackground_G_HomeBackground = HomeBackground_Private_CarSteer(HomeBackground_G_HomeBackground, Event.MenuNavAction, HomeBackground_C_CarStateSteerAnimationDuration);
+			} else if (
+				Event.MenuNavAction == CMlScriptEvent::EMenuNavAction::Up ||
+				Event.MenuNavAction == CMlScriptEvent::EMenuNavAction::Down
+			) {
+				HomeBackground_G_HomeBackground = HomeBackground_Private_CarBoost(HomeBackground_G_HomeBackground, Event.MenuNavAction, HomeBackground_C_CarStateBoostAnimationDuration);
+			} else if (
+				Event.MenuNavAction == CMlScriptEvent::EMenuNavAction::PageUp ||
+				Event.MenuNavAction == CMlScriptEvent::EMenuNavAction::PageDown
+			) {
+				HomeBackground_G_HomeBackground = HomeBackground_Private_SelectDayPart(HomeBackground_G_HomeBackground, Event.MenuNavAction);
+			}
+		}
+	}
+
+	if (HomeBackground_G_HomeBackground.CameraScene.Light.TransitionStartTime >= 0 && Now >= HomeBackground_G_HomeBackground.CameraScene.Light.TransitionStartTime) {
+		HomeBackground_G_HomeBackground = HomeBackground_Private_UpdateCameraSceneLightAnimation(HomeBackground_G_HomeBackground);
+	}
+	if (
+		(HomeBackground_G_HomeBackground.CameraScene.CarState.SteerAnimation.StartTime >= 0 && Now >= HomeBackground_G_HomeBackground.CameraScene.CarState.SteerAnimation.StartTime) ||
+		(HomeBackground_G_HomeBackground.CameraScene.CarState.BoostAnimation.StartTime >= 0 && Now >= HomeBackground_G_HomeBackground.CameraScene.CarState.BoostAnimation.StartTime) ||
+		(HomeBackground_G_HomeBackground.CameraScene.CarState.FlyAnimation.StartTime >= 0 && Now >= HomeBackground_G_HomeBackground.CameraScene.CarState.FlyAnimation.StartTime)
+	) {
+		HomeBackground_G_HomeBackground = HomeBackground_Private_UpdateCarState(HomeBackground_G_HomeBackground);
+	}
+}
+if (HomeBackground_G_HomeBackground.TransitionEndTime >= 0) {
+	if (HomeBackground_G_HomeBackground.CameraScene.SceneId != NullId) {
+		MenuSceneMgr.PlaneReflectRefresh();
+	}
+	if (Now >= HomeBackground_G_HomeBackground.TransitionEndTime) {
+		HomeBackground_G_HomeBackground = HomeBackground_Private_TransitionEnd(HomeBackground_G_HomeBackground);
+	}
+}
+if (HomeBackground_G_HomeBackground.EnableDelayEndTime >= 0 && Now >= HomeBackground_G_HomeBackground.EnableDelayEndTime) {
+	HomeBackground_G_HomeBackground = HomeBackground_Private_Enable(HomeBackground_G_HomeBackground, False, HomeBackground_G_HomeBackground.EnableDelayValue);
+}
+***
+
+// */
+// @Component end component-home-background
+
+// @Component start router
+// /*
+
+declare Router_K_RouterEvent[] Router_PendingEvents;
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ //
+/** Lock or unlock an overlay
+ *
+ *	@param	_OverlayName										The name of the overlay to lock/unlock
+ *	@param	_IsLocked												The lock state for the overlay
+ */
+Void Router_LockOverlay(Text _OverlayName, Boolean _IsLocked) {
+	declare Text IsLocked = "0";
+	if (_IsLocked) IsLocked = "1";
+	SendCustomEvent("Router_OverlayLocked", [_OverlayName, IsLocked]);
+}
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ //
+/** Check if an overlay is currently locked
+ *
+ *	@param	_OverlayName										The name of the overlay to check
+ */
+Boolean Router_IsOverlayLocked(Text _OverlayName) {
+	declare Text[] Router_LockedOverlays for LocalUser;
+	return Router_LockedOverlays.exists(_OverlayName);
+}
+
+Void Router_Push(Text _URL, Text[Text] _Query, Router_K_URL_Config _Config) {
+	declare Text[] Data = [_URL];
+	Data.add(_Query.tojson());
+	Data.add(_Config.tojson());
+	SendCustomEvent("Router_Push", Data);
+}
+Void Router_Push(Text _URL, Text[Text] _Query, Boolean _KeepPreviousPagesDisplayed, Boolean _HidePreviousPage, Boolean _ShowParent) {
+	declare Router_K_URL_Config Config;
+	declare Text[] Data = [_URL];
+	Config = Router_K_URL_Config {
+		SaveHistory = True,
+		ResetPreviousPagesDisplayed = True,
+		KeepPreviousPagesDisplayed = _KeepPreviousPagesDisplayed,
+		HidePreviousPage = _HidePreviousPage,
+		ShowParentPage = _ShowParent,
+		ExcludeOverlays = []
+	};
+	Data.add(_Query.tojson());
+	Data.add(Config.tojson());
+	SendCustomEvent("Router_Push", Data);
+}
+Void Router_Push(Text _URL, Text[Text] _Query, Boolean _KeepPreviousPagesDisplayed, Boolean _HidePreviousPage) {
+	Router_Push(_URL, _Query, _KeepPreviousPagesDisplayed, _HidePreviousPage, False);
+}
+Void Router_Push(Text _URL, Text[Text] _Query, Boolean _KeepPreviousPagesDisplayed) {
+	Router_Push(_URL, _Query, _KeepPreviousPagesDisplayed, False, False);
+}
+Void Router_Push(Text _URL, Boolean _KeepPreviousPagesDisplayed) {
+	Router_Push(_URL, [], _KeepPreviousPagesDisplayed, False, False);
+}
+Void Router_Push(Text _URL, Text[Text] _Query) {
+	Router_Push(_URL, _Query, False, True);
+}
+Void Router_Push(Text _URL) {
+	Router_Push(_URL, [], False, True);
+}
+
+Void Router_PushParent(Text _URL, Text[Text] _Query, Router_K_URL_Config _Config) {
+	SendCustomEvent("Router_PushParent", [_URL, _Query.tojson(), _Config.tojson()]);
+}
+Void Router_PushParent(Text _URL, Text[Text] _Query) {
+	Router_PushParent(_URL, _Query, Router_K_URL_Config {
+		SaveHistory = True,
+		ResetPreviousPagesDisplayed = True,
+		KeepPreviousPagesDisplayed = False,
+		HidePreviousPage = True,
+		ShowParentPage = False,
+		ExcludeOverlays = []
+	});
+}
+Void Router_PushParent(Text _URL) {
+	SendCustomEvent("Router_PushParent", [_URL]);
+}
+Void Router_PushParent(Text[Text] _Query, Router_K_URL_Config _Config) {
+	declare K_Router_Route Router_CurrentRoute for LocalUser;
+	Router_PushParent(Router_CurrentRoute.URL.Path, _Query, _Config);
+}
+Void Router_PushParent(Text[Text] _Query) {
+	declare K_Router_Route Router_CurrentRoute for LocalUser;
+	Router_PushParent(Router_CurrentRoute.URL.Path, _Query);
+}
+Void Router_PushParent() {
+	declare K_Router_Route Router_CurrentRoute for LocalUser;
+	Router_PushParent(Router_CurrentRoute.URL.Path);
+}
+
+Void Router_UpdateOverlayData(Text _OverlayName, Text[Text] _Data) {
+	declare Text[] Data = [_OverlayName];
+	Data.add(_Data.tojson());
+	SendCustomEvent("Router_OverlayUpdateData", Data);
+}
+
+Void Router_UpdateOverlayParent(Text _OverlayName, Text[Text] _Data) {
+	declare Text[] Data = [_OverlayName];
+	Data.add(_Data.tojson());
+	SendCustomEvent("Router_OverlayUpdateParent", Data);
+}
+
+Void Router_SetParentPath(Text _Path, Text _ParentPath) {
+	SendCustomEvent("Router_SetParentPath", [_Path, _ParentPath]);
+}
+Void Router_SetParentURL(Text _Path, K_Router_URL _URL) {
+	SendCustomEvent("Router_SetParentURL", [_Path, _URL.tojson()]);
+}
+
+Void Router_Go(Integer _Steps) {
+	SendCustomEvent("Router_Go", [""^_Steps]);
+}
+
+Boolean Router_TransitionIsActive() {
+	declare Boolean Router_TransitionIsActive for Page;
+	return Router_TransitionIsActive;
+}
+
+K_Router_Route Router_GetCurrentRoute() {
+	declare K_Router_Route Router_CurrentRoute for LocalUser;
+	return Router_CurrentRoute;
+}
+
+Text Router_GetCurrentRoutePath() {
+	return Router_GetCurrentRoute().URL.Path;
+}
+
+Boolean Router_PageIsRunning(Text _Path) {
+	declare Text[] Router_CurrentDeactivatedPaths for LocalUser;
+	return PageIsVisible && !Router_CurrentDeactivatedPaths.exists(_Path);
+}
+
+Boolean Router_PageIsRunning() {
+	return Router_PageIsRunning(Router_GetCurrentRoutePath());
+}
+
+Text[Text] Router_GetCurrentRouteQuery() {
+	return Router_GetCurrentRoute().URL.Query;
+}
+
+Text Router_GetCurrentParentPath() {
+	declare K_Router_Route Router_CurrentRoute for LocalUser;
+	return Router_CurrentRoute.ParentURL.Path;
+}
+
+K_Router_Route[] Router_GetHistory() {
+	declare K_Router_Route[] Router_History for LocalUser;
+	return Router_History;
+}
+Integer Router_GetHistoryKey() {
+	declare Integer Router_HistoryKey for LocalUser;
+	return Router_HistoryKey;
+}
+
+Boolean Router_IsPreloadDone() {
+	declare Boolean Router_IsPreloadDone for LocalUser;
+	return Router_IsPreloadDone;
+}
+
+***MainLoop***
+***
+Router_PendingEvents = [];
+
+foreach (Event in PendingEvents) {
+	switch (Event.Type) {
+		case CMlScriptEvent::Type::PluginCustomEvent: {
+			if (Event.CustomEventType == "Router_AddPendingEvent") {
+				if (Event.CustomEventData.count > 0 && Event.CustomEventData.count <= 1) {
+					Router_PendingEvents.add(Router_K_RouterEvent {
+						Type = Event.CustomEventData[0],
+						Data = []
+					});
+				} else if (Event.CustomEventData.count > 1) {
+					declare Text[Text] Data;
+					Data.fromjson(Event.CustomEventData[1]);
+					Router_PendingEvents.add(Router_K_RouterEvent {
+						Type = Event.CustomEventData[0],
+						Data = Data
+					});
+				}
+			}
+		}
+	}
+}
+***
+
+// */
+// @Component end router
+
+Void Private_RedrawQuadVisibility(CMlQuad _Quad, Boolean _Visible, Integer _TransitionDuration) {
+	AnimMgr.Flush(_Quad);
+
+	declare Real Opacity = 0.;
+	if (_Visible) {
+		Opacity = 1.;
+	}
+
+	if (_TransitionDuration > 0) {
+		AnimMgr.Add(_Quad, "<a opacity=\""^Opacity^"\" hidden=\""^!_Visible^"\" />", _TransitionDuration, CAnimManager::EAnimManagerEasing::QuadIn);
+	} else {
+		_Quad.Opacity = Opacity;
+		_Quad.Visible = _Visible;
+	}
+}
+
+Real Private_GetBackgroundZIndex(Integer _Background, Integer _OldDisplayMode, Integer _NewDisplayMode) {
+	if (_Background == C_DisplayMode_HomeBackground) return 1.;
+	else if (_Background == _NewDisplayMode) return 2.;
+	else if (_Background == _OldDisplayMode) return 3.;
+	return 0.;
+}
+
+K_MenuBackground Private_TransitionEnd(K_MenuBackground _MenuBackground) {
+	if (_MenuBackground.TransitionEndTime < 0) return _MenuBackground;
+
+	declare K_MenuBackground MenuBackground = _MenuBackground;
+
+	MenuBackground.TransitionEndTime = -1;
+
+	switch (_MenuBackground.OldDisplayMode) {
+		case C_DisplayMode_MainBackground: {
+			ComponentMainBackground_SetVisibility(False, 0);
+		}
+		case C_DisplayMode_HomeBackground: {
+			HomeBackground_Enable(False);
+		}
+		case C_DisplayMode_SettingsBackground: {
+			Private_RedrawQuadVisibility(_MenuBackground.Controls.Quad_SettingsBackground, False, 0);
+		}
+		case C_DisplayMode_ProfileBackground: {
+			Private_RedrawQuadVisibility(_MenuBackground.Controls.Quad_ProfileBackground, False, 0);
+		}
+		case C_DisplayMode_BlackBackground: {
+			Private_RedrawQuadVisibility(_MenuBackground.Controls.Quad_BlackBackground, False, 0);
+		}
+	}
+
+	return MenuBackground;
+}
+
+Void Private_TransitionStart_HomeBackground(K_MenuBackground _MenuBackground) {
+	if (_MenuBackground.ActiveDisplayMode == C_DisplayMode_HomeBackground || _MenuBackground.OldDisplayMode == C_DisplayMode_HomeBackground) {
+		HomeBackground_Enable(True);
+	} else {
+		HomeBackground_Enable(False);
+	}
+}
+
+Void Private_TransitionStart_MainBackground(K_MenuBackground _MenuBackground, Integer _TransitionDuration) {
+	if (_MenuBackground.ActiveDisplayMode == C_DisplayMode_MainBackground || _MenuBackground.OldDisplayMode == C_DisplayMode_MainBackground) {
+		if (_MenuBackground.OldDisplayMode == C_DisplayMode_HomeBackground) {
+			ComponentMainBackground_SetVisibility(False, 0);
+			ComponentMainBackground_SetVisibility(True, _TransitionDuration);
+		} else {
+			ComponentMainBackground_SetVisibility(True, 0);
+			if (_MenuBackground.OldDisplayMode == C_DisplayMode_MainBackground && _MenuBackground.ActiveDisplayMode != C_DisplayMode_MainBackground) {
+				ComponentMainBackground_SetVisibility(False, _TransitionDuration);
+			}
+		}
+	} else {
+		ComponentMainBackground_SetVisibility(False, 0);
+	}
+}
+
+Void Private_TransitionStart_Quad(K_MenuBackground _MenuBackground, CMlQuad _Quad, Integer _DisplayMode, Integer _TransitionDuration) {
+	if (_MenuBackground.ActiveDisplayMode == _DisplayMode || _MenuBackground.OldDisplayMode == _DisplayMode) {
+		if (_MenuBackground.OldDisplayMode == C_DisplayMode_HomeBackground) {
+			Private_RedrawQuadVisibility(_Quad, False, 0);
+			Private_RedrawQuadVisibility(_Quad, True, _TransitionDuration);
+		} else {
+			Private_RedrawQuadVisibility(_Quad, True, 0);
+			if (_MenuBackground.OldDisplayMode == _DisplayMode && _MenuBackground.ActiveDisplayMode != _DisplayMode) {
+				Private_RedrawQuadVisibility(_Quad, False, _TransitionDuration);
+			}
+		}
+	} else {
+		Private_RedrawQuadVisibility(_Quad, False, 0);
+	}
+}
+
+Void Private_TransitionStart_SettingsBackground(K_MenuBackground _MenuBackground, Integer _TransitionDuration) {
+	Private_TransitionStart_Quad(_MenuBackground, _MenuBackground.Controls.Quad_SettingsBackground, C_DisplayMode_SettingsBackground, _TransitionDuration);
+}
+
+Void Private_TransitionStart_ProfileBackground(K_MenuBackground _MenuBackground, Integer _TransitionDuration) {
+	Private_TransitionStart_Quad(_MenuBackground, _MenuBackground.Controls.Quad_ProfileBackground, C_DisplayMode_ProfileBackground, _TransitionDuration);
+}
+
+Void Private_TransitionStart_BlackBackground(K_MenuBackground _MenuBackground, Integer _TransitionDuration) {
+	Private_TransitionStart_Quad(_MenuBackground, _MenuBackground.Controls.Quad_BlackBackground, C_DisplayMode_BlackBackground, _TransitionDuration);
+}
+
+K_MenuBackground Private_TransitionStart(K_MenuBackground _MenuBackground, Integer _TransitionDuration) {
+	declare K_MenuBackground MenuBackground = _MenuBackground;
+
+	MenuBackground.TransitionEndTime = Now + _TransitionDuration;
+
+	_MenuBackground.Controls.Frame_HomeBackground.ZIndex = Private_GetBackgroundZIndex(C_DisplayMode_HomeBackground, _MenuBackground.OldDisplayMode, _MenuBackground.ActiveDisplayMode);
+	_MenuBackground.Controls.Frame_MainBackground.ZIndex = Private_GetBackgroundZIndex(C_DisplayMode_MainBackground, _MenuBackground.OldDisplayMode, _MenuBackground.ActiveDisplayMode);
+	_MenuBackground.Controls.Quad_SettingsBackground.ZIndex = Private_GetBackgroundZIndex(C_DisplayMode_SettingsBackground, _MenuBackground.OldDisplayMode, _MenuBackground.ActiveDisplayMode);
+	_MenuBackground.Controls.Quad_ProfileBackground.ZIndex = Private_GetBackgroundZIndex(C_DisplayMode_ProfileBackground, _MenuBackground.OldDisplayMode, _MenuBackground.ActiveDisplayMode);
+	_MenuBackground.Controls.Quad_BlackBackground.ZIndex = Private_GetBackgroundZIndex(C_DisplayMode_BlackBackground, _MenuBackground.OldDisplayMode, _MenuBackground.ActiveDisplayMode);
+
+	Private_TransitionStart_HomeBackground(MenuBackground);
+	Private_TransitionStart_MainBackground(MenuBackground, _TransitionDuration);
+	Private_TransitionStart_SettingsBackground(MenuBackground, _TransitionDuration);
+	Private_TransitionStart_ProfileBackground(MenuBackground, _TransitionDuration);
+	Private_TransitionStart_BlackBackground(MenuBackground, _TransitionDuration);
+
+	return MenuBackground;
+}
+
+K_MenuBackground Private_UpdateDisplayMode(K_MenuBackground _MenuBackground, Integer _NewDisplayMode, Boolean _IsInit) {
+	if (!_IsInit && _MenuBackground.ActiveDisplayMode == _NewDisplayMode) return _MenuBackground;
+
+	declare K_MenuBackground MenuBackground = _MenuBackground;
+	MenuBackground = Private_TransitionEnd(MenuBackground);
+	MenuBackground.OldDisplayMode = MenuBackground.ActiveDisplayMode;
+	MenuBackground.ActiveDisplayMode = _NewDisplayMode;
+	MenuBackground = Private_TransitionStart(MenuBackground, C_BackgroundTransitionDuration);
+
+	HomeBackground_EnableInputs(MenuBackground.ActiveDisplayMode == C_DisplayMode_HomeBackground);
+
+	return MenuBackground;
+}
+
+K_MenuBackground Private_ApplyRouteDisplayMode(K_MenuBackground _MenuBackground, Integer[Text] _RoutesDisplayModes, Text _Route, Boolean _IsInit) {
+	return Private_UpdateDisplayMode(
+		_MenuBackground,
+        /* PATCH */
+		/* _RoutesDisplayModes.get(_Route, C_DisplayMode_MainBackground), */
+        C_DisplayMode_HomeBackground,
+		_IsInit
+	);
+}
+
+***MainInit***
+***
+declare K_MenuBackground MenuBackground;
+declare Text CurrentRoutePath;
+declare Integer RoutesDisplayModesUpdate;
+declare Integer[Text] OverlayMenuBackground_RoutesDisplayModes for LocalUser = [];
+declare Integer OverlayMenuBackground_RoutesDisplayModesUpdate for LocalUser = 0;
+***
+
+***MainStart***
+***
+MenuBackground = K_MenuBackground {
+	Controls = K_Controls {
+		Frame_HomeBackground = (Page.GetFirstChild("frame-home-background") as CMlFrame),
+		Frame_MainBackground = (Page.GetFirstChild("frame-main-background") as CMlFrame),
+		Quad_SettingsBackground = (Page.GetFirstChild("quad-settings-background") as CMlQuad),
+		Quad_ProfileBackground = (Page.GetFirstChild("quad-profile-background") as CMlQuad),
+		Quad_BlackBackground = (Page.GetFirstChild("quad-black-background") as CMlQuad)
+	},
+	ActiveDisplayMode = C_DisplayMode_Null,
+	OldDisplayMode = C_DisplayMode_Null,
+	TransitionEndTime = -1
+};
+
+CurrentRoutePath = Router_GetCurrentRoutePath();
+RoutesDisplayModesUpdate = OverlayMenuBackground_RoutesDisplayModesUpdate;
+
+MenuBackground = Private_ApplyRouteDisplayMode(MenuBackground, OverlayMenuBackground_RoutesDisplayModes, CurrentRoutePath, True);
+***
+
+***MainLoop***
+***
+if (PageIsVisible) {
+	if (MenuBackground.TransitionEndTime >= 0 && Now >= MenuBackground.TransitionEndTime) {
+		MenuBackground = Private_TransitionEnd(MenuBackground);
+	}
+	if (CurrentRoutePath != Router_GetCurrentRoutePath() || RoutesDisplayModesUpdate != OverlayMenuBackground_RoutesDisplayModesUpdate) {
+		CurrentRoutePath = Router_GetCurrentRoutePath();
+		RoutesDisplayModesUpdate = OverlayMenuBackground_RoutesDisplayModesUpdate;
+		MenuBackground = Private_ApplyRouteDisplayMode(MenuBackground, OverlayMenuBackground_RoutesDisplayModes, CurrentRoutePath, False);
+	}
+}
+***
+
+
+Void ManiaView_DoNothing() {}
+
+main() {
+	+++MainInit+++
+	+++MainStart+++
+	while (True) {
+		yield;
+		+++MainLoop+++
+	}
+	+++MainEnd+++
+}
+--></script>
+</manialink>

@@ -3,14 +3,25 @@ enum NadeoMenuBackground
     , Day
     , Evening
     , Night
-    , Stadium_Sunrise
-    , Stadium_Day
-    , Stadium_Sunset
-    , Stadium_Night
-    , Clouds_Sunrise
     , Clouds_Day
     , Clouds_Sunset
     , Clouds_Night
+    , Spring_Morning
+    , Spring_Day
+    , Spring_Sunset
+    , Spring_Night
+    , Summer_Morning
+    , Summer_Day
+    , Summer_Sunset
+    , Summer_Night
+    , Fall_Morning
+    , Fall_Day
+    , Fall_Sunset
+    , Fall_Night
+    , Winter_Morning
+    , Winter_Day
+    , Winter_Sunset
+    , Winter_Night
     , Garage
     , Royal_Dawn
     , Royal_Midday
@@ -38,14 +49,25 @@ const string[] MenuBgNames =
     , 'Day'
     , 'Evening'
     , 'Night'
-    , 'Stadium_Sunrise'
-    , 'Stadium_Day'
-    , 'Stadium_Sunset'
-    , 'Stadium_Night'
-    , 'Clouds_Sunrise (webm)'
     , 'Clouds_Day (webm)'
     , 'Clouds_Sunset (webm)'
     , 'Clouds_Night (webm)'
+    , "Spring_Morning"
+    , "Spring_Day"
+    , "Spring_Sunset"
+    , "Spring_Night"
+    , "Summer_Morning"
+    , "Summer_Day"
+    , "Summer_Sunset"
+    , "Summer_Night"
+    , "Fall_Morning"
+    , "Fall_Day"
+    , "Fall_Sunset"
+    , "Fall_Night"
+    , "Winter_Morning"
+    , "Winter_Day"
+    , "Winter_Sunset"
+    , "Winter_Night"
     , 'Garage'
     , 'Royal_Dawn'
     , 'Royal_Midday'
@@ -75,14 +97,25 @@ dictionary MenuBgFiles =
     , {'Day', bgfp + 'MainBackgrounds/Background_Day.dds'}
     , {'Evening', bgfp + 'MainBackgrounds/Background_Evening.dds'}
     , {'Night', bgfp + 'MainBackgrounds/Background_Night.dds'}
-    , {'Stadium_Sunrise', bgfp + 'HomeBackground/Stadium_Sunrise.dds'}
-    , {'Stadium_Day', bgfp + 'HomeBackground/Stadium_Day.dds'}
-    , {'Stadium_Sunset', bgfp + 'HomeBackground/Stadium_Sunset.dds'}
-    , {'Stadium_Night', bgfp + 'HomeBackground/Stadium_Night.dds'}
-    , {'Clouds_Sunrise (webm)', bgfp + 'HomeBackground/Clouds_Sunrise.webm'}
     , {'Clouds_Day (webm)', bgfp + 'HomeBackground/Clouds_Day.webm'}
     , {'Clouds_Sunset (webm)', bgfp + 'HomeBackground/Clouds_Sunset.webm'}
     , {'Clouds_Night (webm)', bgfp + 'HomeBackground/Clouds_Night.webm'}
+    , {'Spring_Morning', bgfp + "HomeBackground/MenuBackground_Spring_Morning.dds"}
+    , {'Spring_Day', bgfp + "HomeBackground/MenuBackground_Spring_Day.dds"}
+    , {'Spring_Sunset', bgfp + "HomeBackground/MenuBackground_Spring_Sunset.dds"}
+    , {'Spring_Night', bgfp + "HomeBackground/MenuBackground_Spring_Night.dds"}
+    , {'Summer_Morning', bgfp + "HomeBackground/MenuBackground_Summer_Morning.dds"}
+    , {'Summer_Day', bgfp + "HomeBackground/MenuBackground_Summer_Day.dds"}
+    , {'Summer_Sunset', bgfp + "HomeBackground/MenuBackground_Summer_Sunset.dds"}
+    , {'Summer_Night', bgfp + "HomeBackground/MenuBackground_Summer_Night.dds"}
+    , {'Fall_Morning', bgfp + "HomeBackground/MenuBackground_Fall_Morning.dds"}
+    , {'Fall_Day', bgfp + "HomeBackground/MenuBackground_Fall_Day.dds"}
+    , {'Fall_Sunset', bgfp + "HomeBackground/MenuBackground_Fall_Sunset.dds"}
+    , {'Fall_Night', bgfp + "HomeBackground/MenuBackground_Fall_Night.dds"}
+    , {'Winter_Morning', bgfp + "HomeBackground/MenuBackground_Winter_Morning.dds"}
+    , {'Winter_Day', bgfp + "HomeBackground/MenuBackground_Winter_Day.dds"}
+    , {'Winter_Sunset', bgfp + "HomeBackground/MenuBackground_Winter_Sunset.dds"}
+    , {'Winter_Night', bgfp + "HomeBackground/MenuBackground_Winter_Night.dds"}
     , {'Garage', bgfp + 'PageGarage/Garage_background.dds'}
     , {'Royal_Dawn', bgfp + 'PageMatchmakingMain/Background/Royal_Dawn.dds'}
     , {'Royal_Midday', bgfp + 'PageMatchmakingMain/Background/Royal_Midday.dds'}
