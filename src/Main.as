@@ -67,6 +67,7 @@ void CoroMain() {
         yield();
     }
     startnew(SetBLSManifest);
+    startnew(GreepList::UpdateList);
     tmxCurrUrl = InitTmxUrlAndData();
     startnew(CheckAndCacheCustomUrl);
     startnew(LoadCurrTmxData);
@@ -192,6 +193,8 @@ void SetQuad(uint ix, CGameManialinkQuad@ quad) {
         SetQuadBLS(quad);
     } else if (Setting_Mode == BgMode::TMX) {
         SetQuadTmx(quad);
+    } else if (Setting_Mode == BgMode::GreepList) {
+        SetQuadGreepList(quad);
     } else if (Setting_Mode == BgMode::CustomUrl) {
         SetQuadCustom(quad);
     } else if (Setting_Mode == BgMode::Disabled) {
@@ -354,10 +357,14 @@ void SetQuadTmx(CGameManialinkQuad@ quad) {
 int randBLSIx = -1;
 void SetQuadBLS(CGameManialinkQuad@ quad) {
     if (!IsBLSInitialized()) return;
-    if (randBLSIx < 0) {
+    if (randBLSIx < 0)
         randBLSIx = Math::Rand(0, blsManifest.Length);
-    }
     CheckAndSetQuadImage(quad, blsManifest[randBLSIx]);
+}
+
+void SetQuadGreepList(CGameManialinkQuad@ quad) {
+    if (!GreepList::GotList()) return;
+    CheckAndSetQuadImage(quad, GreepList::GetImageUrl());
 }
 
 void SetQuadCustom(CGameManialinkQuad@ quad) {

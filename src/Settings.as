@@ -4,6 +4,7 @@ enum BgMode {
     SetTimeOfDay,
     BetterLoadingScreens,
     TMX,
+    GreepList,
     CustomUrl,
     NoBackground,
 }
@@ -12,6 +13,7 @@ string[] ModeNames = { "Disabled"
 , "Set Time of Day (and other TM BGs)"
 , "Use 'Better Loading Screens' BGs"
 , "Trackmania Exchange Monthly BGs"
+, "Greep's List"
 , "Custom BG (via URL)"
 , "No Background"
 };
@@ -89,6 +91,8 @@ void RenderMenuBgSettings() {
             _DrawTod(); break;
         case BgMode::BetterLoadingScreens:
             _DrawBLS(); break;
+        case BgMode::GreepList:
+            _DrawGreepList(); break;
         case BgMode::TMX:
             _DrawTmx(); break;
         case BgMode::CustomUrl:
@@ -139,6 +143,25 @@ void _DrawBLS() {
     }
 
     if (!IsBLSInitialized())
+        UI::EndDisabled();
+
+    UI::PopFont();
+}
+
+void _DrawGreepList() {
+    UI::PushFont(fontLarger);
+    UI::Text("Background will be set to a random image from Greep's list.");
+    UI::Text("Downloaded list of images? " + (GreepList::GotList() ? 'Yes (' + GreepList::greepList.Length + ' images)' : 'Not yet'));
+
+    if (!GreepList::GotList())
+        UI::BeginDisabled();
+
+    UI::Text("Current image index: " + GreepList::randIx);
+    if (UI::Button("Randomize Background")) {
+        GreepList::randIx = Math::Rand(0, GreepList::greepList.Length);
+    }
+
+    if (!GreepList::GotList())
         UI::EndDisabled();
 
     UI::PopFont();
