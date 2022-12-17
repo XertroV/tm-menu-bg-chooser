@@ -26,13 +26,19 @@ bool PluginIsEnabled() {
 }
 
 [Setting hidden]
-bool Setting_HideCar = false;
+bool S_HideNewMenuBG = false;
+
+[Setting hidden]
+bool S_StretchMenuForUltrawide = false;
+
+// [Setting hidden]
+// bool Setting_HideCar = false;
 
 [Setting hidden]
 bool Setting_EnableBgRanked = true;
 
-[Setting hidden]
-bool Setting_HideCarOnRanked = false;
+// [Setting hidden]
+// bool Setting_HideCarOnRanked = false;
 
 [SettingsTab name="Menu Background"]
 void RenderMenuBgSettings() {
@@ -57,25 +63,27 @@ void RenderMenuBgSettings() {
         return;
     }
 
+    S_HideNewMenuBG = UI::Checkbox("Hide new menu bg (useful for ultrawide)", S_HideNewMenuBG);
+    S_StretchMenuForUltrawide = UI::Checkbox("Stretch new menu bg (useful for ultrawide)", S_StretchMenuForUltrawide);
 
     Setting_EnableBgRanked = UI::Checkbox("Enable for Ranked/Royal Menu Page?", Setting_EnableBgRanked);
     UI::PopFont();
     AddSimpleTooltip("You might want to disable this if you get flickers on Ranked/Royal BGs and that bothers you.\nThe same menu page is reused for both Ranked/Royal, which means the backgrounds need to be reset each time you load the menu.\nThere are multiple BG layers, and that's why it flickers more on ranked.");
 
-    VPad();
-    UI::Separator();
-    VPad();
+    // VPad();
+    // UI::Separator();
+    // VPad();
 
-    UI::PushFont(fontLarger);
-    UI::Text("Reflection Settings:");
-    UI::PopFont();
-    Setting_HideCar = UI::Checkbox("Hide Car+Reflection on Menu Home Page?", Setting_HideCar);
-    if (!Setting_HideCar) AddSimpleTooltip("If the car does not re-appear, go into a new menu and then back again to reload it.");
-    Setting_HideCarOnRanked = UI::Checkbox("Hide Car+Reflection on Ranked/Royal Page?", Setting_HideCarOnRanked);
-    if (!Setting_HideCarOnRanked) AddSimpleTooltip("If the car does not re-appear, go into a new menu and then back again to reload it.");
-    VPad();
-    UI::TextWrapped("\\$0cfHey! If you want more control over menu reflections, check out *Menu Background Reflections* in the plugin manager.");
-    UI::Markdown("Link: [Menu Background Reflections](https://openplanet.dev/plugin/menu-bg-refls) (opens in browser)");
+    // UI::PushFont(fontLarger);
+    // UI::Text("Reflection Settings:");
+    // UI::PopFont();
+    // Setting_HideCar = UI::Checkbox("Hide Car+Reflection on Menu Home Page?", Setting_HideCar);
+    // if (!Setting_HideCar) AddSimpleTooltip("If the car does not re-appear, go into a new menu and then back again to reload it.");
+    // Setting_HideCarOnRanked = UI::Checkbox("Hide Car+Reflection on Ranked/Royal Page?", Setting_HideCarOnRanked);
+    // if (!Setting_HideCarOnRanked) AddSimpleTooltip("If the car does not re-appear, go into a new menu and then back again to reload it.");
+    // VPad();
+    // UI::TextWrapped("\\$0cfHey! If you want more control over menu reflections, check out *Menu Background Reflections* in the plugin manager.");
+    // UI::Markdown("Link: [Menu Background Reflections](https://openplanet.dev/plugin/menu-bg-refls) (opens in browser)");
 
     VPad();
     UI::Separator();

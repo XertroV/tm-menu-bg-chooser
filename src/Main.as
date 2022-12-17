@@ -1,9 +1,7 @@
 /* Notes:
-
 - Once a bg is added via URL it is cached in: `C:\ProgramData\TrackMania\Cache`
   That means the game won't crash on load if a resource disappears.
-
-  */
+*/
 
 UI::Font@ fontLarger;
 UI::Font@ fontLargerBold;
@@ -97,23 +95,28 @@ void SetMenuBgImages(bool ignoreDisabled = false, bool ignoreVisibility = false)
         auto layer = layers[i];
 
         if (!layer.IsVisible && !ignoreVisibility) continue;
-        // #frame-quad only exists on ranked/royal menu screens (I think) -- this test might need updating in the future
+        // #frame-squad only exists on ranked/royal menu screens (I think) -- this test might need updating in the future
         bool isRanked = layer.LocalPage.GetFirstChild("frame-squad") !is null;
 
         // this is the ControlId for the frame that holds the 4 bg quads
         auto bgFrame = cast<CGameManialinkFrame@>(layer.LocalPage.GetFirstChild("ComponentMainBackground_frame-global"));
         // note: could probably get quads directly via ids like: ComponentMainBackground_quad-morning
+        auto homePageBgFrame = cast<CGameManialinkFrame@>(layer.LocalPage.GetFirstChild("HomeBackground_frame-global"));
+        bool isOnHomePage = homePageBgFrame !is null;
 
-        string cameraVehicleId = isRanked ? "camera-vehicles" : "camera-vehicle";
-        bool carAndReflShouldHide = PluginIsEnabled() && ((Setting_HideCar && !isRanked) || (Setting_HideCarOnRanked && isRanked));
+        // string cameraVehicleId = isRanked ? "camera-vehicles" : "camera-vehicle";
+        // if (isOnHomePage) cameraVehicleId = "HomeBackground_camera-scene";
+        // bool carAndReflShouldHide = PluginIsEnabled() && ((Setting_HideCar && !isRanked) || (Setting_HideCarOnRanked && isRanked));
 
         // main bg updating logic
         if (bgFrame !is null) {
             // auto mainFrame = layer.LocalPage.MainFrame;
-            auto cameraVehicle = cast<CGameManialinkCamera@>(layer.LocalPage.GetFirstChild(cameraVehicleId));
-            if (cameraVehicle !is null) {
-                cameraVehicle.Visible = !carAndReflShouldHide;
-            }
+            // auto cameraVehicle = cast<CGameManialinkCamera@>(layer.LocalPage.GetFirstChild(cameraVehicleId));
+            // if (cameraVehicle !is null) {
+            //     // cameraVehicle.Visible = !carAndReflShouldHide;
+            //     // cameraVehicle.RelativeScale = carAndReflShouldHide ? 0.001 : 1.;
+            //     // cameraVehicle.Control.Clean();
+            // }
 
             // bail early for ranked/royal bgs if not enabled, but after we show/hide the car
             if (isRanked && !Setting_EnableBgRanked) continue;
@@ -127,6 +130,35 @@ void SetMenuBgImages(bool ignoreDisabled = false, bool ignoreVisibility = false)
                 SetQuad(j, quad);
             }
         }
+
+        if (isOnHomePage) {
+            auto bg1 = layer.LocalPage.GetFirstChild("HomeBackground_quad-stadium-active");
+            auto bg2 = layer.LocalPage.GetFirstChild("HomeBackground_quad-stadium-old");
+            auto cl1 = layer.LocalPage.GetFirstChild("HomeBackground_quad-clouds-active");
+            auto cl2 = layer.LocalPage.GetFirstChild("HomeBackground_quad-clouds-old");
+            auto of1 = cast<CGameManialinkQuad@>(layer.LocalPage.GetFirstChild("HomeBackground_quad-overflow-active"));
+            auto of2 = cast<CGameManialinkQuad@>(layer.LocalPage.GetFirstChild("HomeBackground_quad-overflow-old"));
+            if (bg1 !is null) SetNewMenuBg(bg1);
+            if (bg2 !is null) SetNewMenuBg(bg2);
+            if (cl1 !is null) SetNewMenuBg(cl1.Parent);
+            if (cl2 !is null) SetNewMenuBg(cl2.Parent);
+            if (of1 !is null) SetQuad(3, of1);
+            if (of2 !is null) SetQuad(3, of2);
+            // we would set lighting here if we were going to include it
+        }
+    }
+}
+
+
+void SetNewMenuBg(CGameManialinkControl@ control) {
+    control.Visible = !S_HideNewMenuBG;
+    if (S_StretchMenuForUltrawide) {
+        control.Size = vec2(float(Draw::GetWidth()) * 180. / Draw::GetHeight(), 180);
+        // trace('set size to: ' + control.Size.x);
+        // trace('set size to: ' + (float(Draw::GetWidth()) * 180. / Draw::GetHeight()));
+    } else {
+        control.Size = vec2(320, 180);
+        // trace('set size to default: ' + control.Size.x);
     }
 }
 
@@ -200,6 +232,7 @@ void SetQuad(uint ix, CGameManialinkQuad@ quad) {
     } else if (Setting_Mode == BgMode::Disabled) {
         SetQuadDisabled(ix, quad);
     }
+    quad.Visible = true;
 }
 
 /*
