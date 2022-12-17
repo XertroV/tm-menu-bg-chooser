@@ -141,7 +141,9 @@ void SetMenuBgImages(bool ignoreDisabled = false, bool ignoreVisibility = false)
             if (bg1 !is null) SetNewMenuBg(bg1);
             if (bg2 !is null) SetNewMenuBg(bg2);
             if (cl1 !is null) SetNewMenuBg(cl1.Parent);
+            if (cl1 !is null) SetNewMenuBg(cl1);
             if (cl2 !is null) SetNewMenuBg(cl2.Parent);
+            if (cl2 !is null) SetNewMenuBg(cl2);
             if (of1 !is null) SetQuad(3, of1);
             if (of2 !is null) SetQuad(3, of2);
             // we would set lighting here if we were going to include it

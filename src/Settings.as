@@ -29,7 +29,7 @@ bool PluginIsEnabled() {
 bool S_HideNewMenuBG = false;
 
 [Setting hidden]
-bool S_StretchMenuForUltrawide = false;
+bool S_StretchMenuForUltrawide = true;
 
 // [Setting hidden]
 // bool Setting_HideCar = false;
