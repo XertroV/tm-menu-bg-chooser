@@ -3,16 +3,10 @@
   That means the game won't crash on load if a resource disappears.
 */
 
-UI::Font@ fontLarger;
-UI::Font@ fontLargerBold;
-
 string MainMenuOverlayPatched;
 wstring MMOPw;
 
 void Main() {
-    // we do stuff through coros so settings have a chance to load
-    @fontLarger = UI::LoadFont("DroidSans.ttf", 18.0f);
-    @fontLargerBold = UI::LoadFont("DroidSans-Bold.ttf", 18.0f);
     startnew(CoroMain);
     // startnew(CheckNewBgNames);
 }
@@ -171,52 +165,6 @@ string[] MainBgQuadNames =
 , "ComponentMainBackground_quad-morning"
 , "ComponentMainBackground_quad-evening"
 };
-
-// string KNOWN_GOOD_MM_SCRIPT_ML_PAGE_HASH = "7f243e5799f2df67edc0de4c7503767a";
-
-// void SetTypicallyHiddenMenuBgs() {
-//     if (!PluginIsEnabled()) return;
-//     while (!GI::InMainMenu()) yield();
-
-//     auto mc = GI::GetMenuCustom();
-//     while (mc is null) {
-//         yield();
-//         @mc = GI::GetMenuCustom();
-//     }
-//     auto layers = mc.UILayers;
-//     while (layers.Length < 25) {
-//         trace('layers.Length: ' + layers.Length);
-//         yield();
-//         // layers = mc.UILayers;
-//     }
-
-//     for (uint i = 7; i < layers.Length; i++) {
-//         auto layer = layers[i];
-//         // if (!layer.IsVisible) continue;
-
-//         // if we find the homebackground_frame
-//         if (layer.LocalPage.GetFirstChild("HomeBackground_frame-global") !is null) {
-//             auto mlPageHash = Hash::MD5(layer.ManialinkPageUtf8);
-//             print('mlPageHash: ' + mlPageHash);
-//             if (layer.ManialinkPageUtf8.StartsWith("<!-- patched to enable HomeBackground -->"))
-//                 continue;
-//             if (mlPageHash != KNOWN_GOOD_MM_SCRIPT_ML_PAGE_HASH) {
-//                 warn('main menu script hash has changed -- aborting.');
-//                 continue;
-//             }
-//             layer.ManialinkPage = MMOPw;
-//         }
-
-//         if (layer.IsVisible && layer.LocalPage.GetFirstChild("ComponentMainBackground_frame-global") !is null) {
-//             for (uint qNum = 0; qNum < MainBgQuadNames.Length; qNum++) {
-//                 auto quad = cast<CGameManialinkQuad@>(layer.LocalPage.GetFirstChild(MainBgQuadNames[qNum]));
-//                 if (quad is null) continue;
-//                 quad.ImageUrl = '';
-//                 // quad.Opacity = 0.0;
-//             }
-//         }
-//     }
-// }
 
 void SetQuad(uint ix, CGameManialinkQuad@ quad) {
     if (Setting_Mode == BgMode::SetTimeOfDay) {

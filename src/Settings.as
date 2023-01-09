@@ -42,7 +42,7 @@ bool Setting_EnableBgRanked = true;
 
 [SettingsTab name="Menu Background"]
 void RenderMenuBgSettings() {
-    UI::PushFont(fontLarger);
+    // UI::PushFont(fontLarger);
     UI::Text("Background Mode:");
     if (UI::BeginCombo("##menu-bg-mode", ModeNames[Setting_Mode])) {
         for (uint i = 0; i < ModeNames.Length; i++) {
@@ -59,7 +59,7 @@ void RenderMenuBgSettings() {
 
     // exit early (show no other settings) if we're disabled
     if (!PluginIsEnabled()) {
-        UI::PopFont();
+        // UI::PopFont();
         return;
     }
 
@@ -67,16 +67,16 @@ void RenderMenuBgSettings() {
     S_StretchMenuForUltrawide = UI::Checkbox("Stretch new menu bg (useful for ultrawide)", S_StretchMenuForUltrawide);
 
     Setting_EnableBgRanked = UI::Checkbox("Enable for Ranked/Royal Menu Page?", Setting_EnableBgRanked);
-    UI::PopFont();
+    // UI::PopFont();
     AddSimpleTooltip("You might want to disable this if you get flickers on Ranked/Royal BGs and that bothers you.\nThe same menu page is reused for both Ranked/Royal, which means the backgrounds need to be reset each time you load the menu.\nThere are multiple BG layers, and that's why it flickers more on ranked.");
 
     // VPad();
     // UI::Separator();
     // VPad();
 
-    // UI::PushFont(fontLarger);
+    // // UI::PushFont(fontLarger);
     // UI::Text("Reflection Settings:");
-    // UI::PopFont();
+    // // UI::PopFont();
     // Setting_HideCar = UI::Checkbox("Hide Car+Reflection on Menu Home Page?", Setting_HideCar);
     // if (!Setting_HideCar) AddSimpleTooltip("If the car does not re-appear, go into a new menu and then back again to reload it.");
     // Setting_HideCarOnRanked = UI::Checkbox("Hide Car+Reflection on Ranked/Royal Page?", Setting_HideCarOnRanked);
@@ -89,10 +89,10 @@ void RenderMenuBgSettings() {
     UI::Separator();
     VPad();
 
-    UI::PushFont(fontLarger);
+    // UI::PushFont(fontLarger);
     UI::Text("Mode Settings:");
     VPad();
-    UI::PopFont();
+    // UI::PopFont();
 
     switch (Setting_Mode) {
         case BgMode::SetTimeOfDay:
@@ -118,7 +118,7 @@ void RenderMenuBgSettings() {
 NadeoMenuBackground Setting_BackgroundChoice = NadeoMenuBackground::Clouds_Night;
 
 void _DrawTod() {
-    UI::PushFont(fontLarger);
+    // UI::PushFont(fontLarger);
     if (UI::BeginCombo("##bg-chooser-tod", MenuBgNames[Setting_BackgroundChoice])) {
         for (uint i = 0; i < MenuBgNames.Length; i++) {
             if (UI::Selectable(MenuBgNames[i], int(i) == Setting_BackgroundChoice)) {
@@ -127,18 +127,18 @@ void _DrawTod() {
         }
         UI::EndCombo();
     }
-    UI::PopFont();
+    // UI::PopFont();
 }
 
 void _DrawNoBg() {
-    UI::PushFont(fontLarger);
+    // UI::PushFont(fontLarger);
     UI::Text("Background will be set to transparent.");
     UI::Text("This is useful to see what is behind the BG.");
-    UI::PopFont();
+    // UI::PopFont();
 }
 
 void _DrawBLS() {
-    UI::PushFont(fontLarger);
+    // UI::PushFont(fontLarger);
     UI::Text("Background will be set to a random 'Better Loading Screens' image.");
     UI::Text("Downloaded list of BLS images? " + (IsBLSInitialized() ? 'Yes (' + blsManifest.Length + ' images)' : 'Not yet'));
 
@@ -153,11 +153,11 @@ void _DrawBLS() {
     if (!IsBLSInitialized())
         UI::EndDisabled();
 
-    UI::PopFont();
+    // UI::PopFont();
 }
 
 void _DrawGreepList() {
-    UI::PushFont(fontLarger);
+    // UI::PushFont(fontLarger);
     UI::Text("Background will be set to a random image from Greep's list.");
     UI::Text("Downloaded list of images? " + (GreepList::GotList() ? 'Yes (' + GreepList::greepList.Length + ' images)' : 'Not yet'));
 
@@ -172,7 +172,7 @@ void _DrawGreepList() {
     if (!GreepList::GotList())
         UI::EndDisabled();
 
-    UI::PopFont();
+    // UI::PopFont();
 }
 
 /* TMX */
@@ -189,7 +189,7 @@ bool TmxBgIsAPastMonth() {
 }
 
 void _DrawTmx() {
-    UI::PushFont(fontLarger);
+    // UI::PushFont(fontLarger);
     Setting_TmxRandom = UI::Checkbox("Randomize TMX Background?", Setting_TmxRandom);
     if (Setting_TmxRandom)
         UI::BeginDisabled();
@@ -211,7 +211,7 @@ void _DrawTmx() {
     if (Setting_TmxRandom || Setting_TmxCurrent)
         UI::EndDisabled();
 
-    UI::PopFont();
+    // UI::PopFont();
     VPad();
 
     if (UI::Button("Refresh Background")) {
@@ -244,7 +244,7 @@ void _DrawCustom() {
     UI::TextWrapped("\\$fa4Note:\\$z The image URL must point directly to an image -- redirects will not work.");
 
     VPad();
-    UI::PushFont(fontLarger);
+    // UI::PushFont(fontLarger);
     UI::Text("Image URL:");
     bool pressedEnter = false;
     imageURLTextBox = UI::InputText("##bg-chooser-image-url", imageURLTextBox, pressedEnter, UI::InputTextFlags::EnterReturnsTrue);
@@ -253,7 +253,7 @@ void _DrawCustom() {
         Setting_CheckedCurrentCustomImgUrl = false;
         startnew(CheckAndCacheCustomUrl);
     }
-    UI::PopFont();
+    // UI::PopFont();
     VPad();
     // show status msgs when requesting
     if (!UrlOkayToShowAsBg(Setting_CustomImageURL)) {

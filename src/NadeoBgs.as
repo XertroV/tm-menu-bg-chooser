@@ -43,7 +43,8 @@ enum NadeoMenuBackground
     , NoBackground
     }
 
-// MUST match NadeoMenuBackground enum
+// MUST match NadeoMenuBackground enum above.
+
 const string[] MenuBgNames =
     { 'Morning'
     , 'Day'
