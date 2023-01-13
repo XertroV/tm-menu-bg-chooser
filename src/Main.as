@@ -250,7 +250,7 @@ void CheckAndSetQuadImage(CGameManialinkQuad@ quad, const string &in url) {
         trace('Set quad ' + quad.Id.GetName() + ' image: ' + url + ' (was: ' + quad.ImageUrl + ')');
         quad.ChangeImageUrl(url);
         setBgNTimes++;
-        if (Time::Now > 1000 && float(Time::Now) / setBgNTimes > 0.01 && setBgNTimes > 100) {
+        if (Time::Now > 1000 && setBgNTimes / float(Time::Now / 1000.) > 8. && setBgNTimes > 2000) {
             UI::ShowNotification("Menu BG Chooser", "The BG has been set many many more times than one would expect. Something is probably wrong. Aborting to avoid breaking stuff.");
             throw("set the bg too many times");
         }
