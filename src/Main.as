@@ -84,6 +84,13 @@ void SetMenuBgImages(bool ignoreDisabled = false, bool ignoreVisibility = false)
     auto mc = GI::GetMenuCustom();
     auto layers = mc.UILayers;
 
+    if (S_DisableBlurredSidesOnHomePage) {
+        mc.FillExtraSpaceWithBluredContents_Opacity = 0.0;
+    } else if (mc.FillExtraSpaceWithBluredContents_Opacity == 0.0) {
+        // default is 1.0, logic might need updating in future
+        mc.FillExtraSpaceWithBluredContents_Opacity = 1.0;
+    }
+
     // can always skip the first 7 or so layers (they are visible but don't have anything relevant)
     for (uint i = 7; i < layers.Length; i++) {
         auto layer = layers[i];

@@ -29,7 +29,10 @@ bool PluginIsEnabled() {
 bool S_HideNewMenuBG = false;
 
 [Setting hidden]
-bool S_StretchMenuForUltrawide = true;
+bool S_StretchMenuForUltrawide = false;
+
+[Setting hidden]
+bool S_DisableBlurredSidesOnHomePage = false;
 
 // [Setting hidden]
 // bool Setting_HideCar = false;
@@ -65,6 +68,7 @@ void RenderMenuBgSettings() {
 
     S_HideNewMenuBG = UI::Checkbox("Hide new menu bg (useful for ultrawide)", S_HideNewMenuBG);
     S_StretchMenuForUltrawide = UI::Checkbox("Stretch new menu bg (useful for ultrawide)", S_StretchMenuForUltrawide);
+    S_DisableBlurredSidesOnHomePage = UI::Checkbox("Disable Blurred Sides on Home Page (useful for ultrawide)", S_DisableBlurredSidesOnHomePage);
 
     Setting_EnableBgRanked = UI::Checkbox("Enable for Ranked/Royal Menu Page?", Setting_EnableBgRanked);
     // UI::PopFont();
