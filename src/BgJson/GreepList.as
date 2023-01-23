@@ -1,6 +1,6 @@
 
 namespace GreepList {
-    string url = "https://greep.gq/api/trackmaniabackgrounds.json";
+    string url = "https://www.greep.fr/api/trackmaniabackgrounds.json";
 
     Json::Value@ FetchGreepList() {
         auto req = Net::HttpGet(url);
