@@ -43,6 +43,10 @@ bool Setting_EnableBgRanked = true;
 // [Setting hidden]
 // bool Setting_HideCarOnRanked = false;
 
+void DisableMenuBgs() {
+    SetMenuBgImages(true, true);
+}
+
 [SettingsTab name="Menu Background"]
 void RenderMenuBgSettings() {
     // UI::PushFont(fontLarger);
@@ -53,7 +57,7 @@ void RenderMenuBgSettings() {
                 Setting_Mode = BgMode(i);
                 // if the setting mode gets changed to disabled, force-run SetMenuBgItems once
                 if (!PluginIsEnabled()) {
-                    SetMenuBgImages(true, true);
+                    startnew(DisableMenuBgs);
                 }
             }
         }
