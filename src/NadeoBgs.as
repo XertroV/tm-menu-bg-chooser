@@ -90,7 +90,7 @@ const string[] MenuBgNames =
     , 'No Background'
     };
 
-const string BgFilePrefix = "file://Media/Manialinks/Nadeo/TMNext/Menus/";
+const string BgFilePrefix = "file://Media/Manialinks/Nadeo/Trackmania/Menus/";
 const string bgfp = BgFilePrefix;
 
 dictionary MenuBgFiles =

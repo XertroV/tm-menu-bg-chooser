@@ -227,7 +227,7 @@ uint lastWarn = 0;
 // include the suffix for timeOfDay
 string GetDefaultBgUrl(const string &in timeOfDay) {
     if (!MenuBgFiles.Exists(timeOfDay)) {
-        if (lastWarn + 5000 < Time::Now) {
+        if (lastWarn + 60000 < Time::Now) {
             lastWarn = Time::Now;
             warn('Time of day does not exist: \'' + timeOfDay + '\'');
             string msg = "Time of day not found: '" + timeOfDay + "'. This should not happen, please msg @XertroV on Openplanet discord.";
@@ -238,7 +238,7 @@ string GetDefaultBgUrl(const string &in timeOfDay) {
 
     string filePath = string(MenuBgFiles[timeOfDay]);
     if (filePath != '' && !GameFileExists(filePath)) {
-        if (lastWarn + 5000 < Time::Now) {
+        if (lastWarn + 60000 < Time::Now) {
             lastWarn = Time::Now;
             warn('Could not find game file that should exist: \'' + filePath + '\'');
             string msg = "Missing file: " + filePath + ". Menu BG Chooser is exiting to avoid a crash. This should not happen, please msg @XertroV on Openplanet discord.";
