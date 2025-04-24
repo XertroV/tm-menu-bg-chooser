@@ -100,7 +100,8 @@ void SetMenuBgImages(bool ignoreDisabled = false, bool ignoreVisibility = false)
         bool isRanked = layer.LocalPage.GetFirstChild("frame-squad") !is null;
 
         // this is the ControlId for the frame that holds the 4 bg quads
-        auto bgFrame = cast<CGameManialinkFrame@>(layer.LocalPage.GetFirstChild("ComponentMainBackground_frame-global"));
+        // auto bgFrame = cast<CGameManialinkFrame@>(layer.LocalPage.GetFirstChild("ComponentMainBackground_frame-global"));
+        auto bgFrame = cast<CGameManialinkQuad@>(layer.LocalPage.GetFirstChild("quad-main-background"));
         // note: could probably get quads directly via ids like: ComponentMainBackground_quad-morning
         auto homePageBgFrame = cast<CGameManialinkFrame@>(layer.LocalPage.GetFirstChild("HomeBackground_frame-global"));
         bool isOnHomePage = homePageBgFrame !is null;
@@ -124,12 +125,13 @@ void SetMenuBgImages(bool ignoreDisabled = false, bool ignoreVisibility = false)
             if (isRanked && Setting_Mode == BgMode::Disabled) continue;  // these menus reset themselves so nothing to do here if we're disabled.
 
             // print("uiLayer: " + layer.IdName + ", bgFrame: " + bgFrame.IdName);
-            auto cs = bgFrame.Controls;
-            for (uint j = 0; j < cs.Length; j++) {
-                auto quad = cast<CGameManialinkQuad@>(cs[j]);
-                if (quad is null) continue;
-                SetQuad(j, quad);
-            }
+            SetQuad(0, bgFrame);
+            // auto cs = bgFrame.Controls;
+            // for (uint j = 0; j < cs.Length; j++) {
+            //     auto quad = cast<CGameManialinkQuad@>(cs[j]);
+            //     if (quad is null) continue;
+            //     SetQuad(j, quad);
+            // }
         }
 
         if (isOnHomePage) {

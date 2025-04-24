@@ -1,8 +1,12 @@
 enum NadeoMenuBackground
-    { Morning = 0
-    , Day
-    , Evening
-    , Night
+    // { Morning = 0
+    // , Day
+    // , Evening
+    // , Night
+    { Menu0 = 0
+    , Menu1
+    , Menu2
+    , Menu3
     , Clouds_Day
     , Clouds_Sunset
     , Clouds_Night
@@ -46,10 +50,14 @@ enum NadeoMenuBackground
 // MUST match NadeoMenuBackground enum above.
 
 const string[] MenuBgNames =
-    { 'Morning'
-    , 'Day'
-    , 'Evening'
-    , 'Night'
+    { 'Menu(0)'
+    , 'Menu(1)'
+    , 'Menu(2)'
+    , 'Menu(3)'
+    // { 'Morning'
+    // , 'Day'
+    // , 'Evening'
+    // , 'Night'
     , 'Clouds_Day (webm)'
     , 'Clouds_Sunset (webm)'
     , 'Clouds_Night (webm)'
@@ -93,11 +101,15 @@ const string[] MenuBgNames =
 const string BgFilePrefix = "file://Media/Manialinks/Nadeo/Trackmania/Menus/";
 const string bgfp = BgFilePrefix;
 
+    // { {'Morning', bgfp + 'MainBackgrounds/Background_Morning.dds'}
+    // , {'Day', bgfp + 'MainBackgrounds/Background_Day.dds'}
+    // , {'Evening', bgfp + 'MainBackgrounds/Background_Evening.dds'}
+    // , {'Night', bgfp + 'MainBackgrounds/Background_Night.dds'}
 dictionary MenuBgFiles =
-    { {'Morning', bgfp + 'MainBackgrounds/Background_Morning.dds'}
-    , {'Day', bgfp + 'MainBackgrounds/Background_Day.dds'}
-    , {'Evening', bgfp + 'MainBackgrounds/Background_Evening.dds'}
-    , {'Night', bgfp + 'MainBackgrounds/Background_Night.dds'}
+    { {'Menu(0)', bgfp + 'MainBackgrounds/Background_Menu.dds'}
+    , {'Menu(1)', bgfp + 'MainBackgrounds/Background_Menu.dds'}
+    , {'Menu(2)', bgfp + 'MainBackgrounds/Background_Menu.dds'}
+    , {'Menu(3)', bgfp + 'MainBackgrounds/Background_Menu.dds'}
     , {'Clouds_Day (webm)', bgfp + 'HomeBackground/Clouds_Day.webm'}
     , {'Clouds_Sunset (webm)', bgfp + 'HomeBackground/Clouds_Sunset.webm'}
     , {'Clouds_Night (webm)', bgfp + 'HomeBackground/Clouds_Night.webm'}
